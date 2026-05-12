@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { VocabularyExercise } from '@/components/VocabularyExercise';
 import { ExerciseFlow } from '@/components/ExerciseFlow';
 import { ProgressTracker } from '@/components/ProgressTracker';
+import { MonthIntro } from '@/components/MonthIntro';
 import { level1Vocabulary } from '@/data/vocabulary/level-1';
 import { novemberPhase1Exercises } from '@/data/exercises/november-phase1';
 import { useTheme } from '@/hooks/useTheme';
@@ -13,6 +14,7 @@ type Tab = 'sanasto' | 'tositekirjaus';
 
 export function DemoTabs() {
   const [tab, setTab] = useState<Tab>('sanasto');
+  const [introSeen, setIntroSeen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [statuses, setStatuses] = useState<DocumentStatus[]>(
     novemberPhase1Exercises.map(() => 'aloittamatta'),
@@ -69,7 +71,13 @@ export function DemoTabs() {
         </div>
       )}
 
-      {tab === 'tositekirjaus' && (
+      {tab === 'tositekirjaus' && !introSeen && (
+        <div className="demo-pane">
+          <MonthIntro onStart={() => setIntroSeen(true)} />
+        </div>
+      )}
+
+      {tab === 'tositekirjaus' && introSeen && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
             <ProgressTracker
