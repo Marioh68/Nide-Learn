@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useId } from 'react';
+import { useId } from 'react';
 import { getAvailableAccounts } from '@/data/accounts/chart-of-accounts';
 import { calcBalance } from '@/lib/checkExercise';
-import type { StudentEntry, ExerciseSide } from '@/types/exercises';
+import type { StudentEntry } from '@/types/exercises';
 import type { Theme } from '@/components/ThemeProvider';
 
 interface JournalEntryFormProps {
@@ -80,7 +80,7 @@ interface FormProps {
 // ─── Netvisor style ────────────────────────────────────────────────────────────
 // One amount column: positive = debet, negative = kredit (no D/K dropdown)
 
-function NetvisorForm({ entries, availableAccounts, balance, disabled, onUpdateFields, onAdd, onRemove }: FormProps) {
+function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, onAdd, onRemove }: FormProps) {
   // Display value: debet → positive, kredit → negative
   function displayAmount(e: StudentEntry): string {
     if (e.amount === 0) return '';
@@ -187,7 +187,7 @@ function NetvisorForm({ entries, availableAccounts, balance, disabled, onUpdateF
 
 // ─── Procountor style ──────────────────────────────────────────────────────────
 
-function ProcountorForm({ entries, availableAccounts, balance, disabled, uid, onUpdate, onUpdateFields, onAdd, onRemove }: FormProps) {
+function ProcountorForm({ entries, availableAccounts, balance, disabled, onUpdate, onUpdateFields, onAdd, onRemove }: FormProps) {
   return (
     <div className="jef jef-procountor">
       <table className="jef-table">

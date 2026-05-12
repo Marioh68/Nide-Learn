@@ -45,7 +45,9 @@ function PhaseView({
   const [shuffledDefs, setShuffledDefs] = useState<VocabularyPair[]>(phase.pairs);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: shuffle runs client-side only to avoid SSR hydration mismatch
     setShuffledTerms(shuffle(phase.pairs));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShuffledDefs(shuffle(phase.pairs));
   }, [phase.pairs]);
 
@@ -107,7 +109,6 @@ function PhaseView({
       >
         {/* Terms column */}
         <div
-          role="list"
           aria-label="Termit"
           style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
         >
@@ -132,7 +133,6 @@ function PhaseView({
             return (
               <button
                 key={pair.id}
-                role="listitem"
                 onClick={() => handleTermClick(pair.id)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
@@ -175,7 +175,6 @@ function PhaseView({
 
         {/* Definitions column */}
         <div
-          role="list"
           aria-label="Määritelmät"
           style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
         >

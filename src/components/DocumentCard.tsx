@@ -21,7 +21,7 @@ interface DocumentCardProps {
   baseMonthOffset?: number;
 }
 
-export function DocumentCard({ template, baseMonthOffset = 0 }: DocumentCardProps) {
+export function DocumentCard({ template }: DocumentCardProps) {
   const monthName = MONTH_NAMES[template.monthOffset] ?? `Kuukausi ${template.monthOffset + 1}`;
   const dateStr = `${monthName} ${template.day}.`;
   const typeLabel = TYPE_LABELS[template.type];
