@@ -116,10 +116,12 @@ test.describe('Teeman vaihto muistiotositteessa', () => {
     await page.getByRole('button', { name: /Jatka muistiotosite/i }).click();
   });
 
-  test('Netvisor-teema näyttää D/K-sarakkeen', async ({ page }) => {
+  test('Netvisor-teema näyttää yksi summa-sarake ilman D/K-pudotusvalikkoa', async ({ page }) => {
     await page.getByRole('button', { name: 'Netvisor' }).click();
     await expect(page.locator('.jef-netvisor')).toBeVisible();
-    await expect(page.getByText('D/K')).toBeVisible();
+    // One amount column with hint, no D/K dropdown
+    await expect(page.getByText('+ debet / − kredit', { exact: false })).toBeVisible();
+    await expect(page.locator('.jef-nv-header')).toBeVisible();
   });
 
   test('Procountor-teema näyttää erilliset Debet/Kredit-sarakkeet', async ({ page }) => {
