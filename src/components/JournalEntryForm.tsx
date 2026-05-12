@@ -33,6 +33,14 @@ export function JournalEntryForm({
     );
   }
 
+  function updateEntryFields(id: string, fields: Partial<StudentEntry>) {
+    onChange(
+      entries.map((e) =>
+        e.id === id ? { ...e, ...fields } : e,
+      ),
+    );
+  }
+
   function addRow() {
     const newEntry: StudentEntry = {
       id: `${uid}-${Date.now()}`,
@@ -48,9 +56,9 @@ export function JournalEntryForm({
   }
 
   if (theme === 'netvisor') {
-    return <NetvisorForm entries={entries} availableAccounts={availableAccounts} balance={balance} disabled={disabled} onUpdate={updateEntry} onAdd={addRow} onRemove={removeRow} uid={uid} />;
+    return <NetvisorForm entries={entries} availableAccounts={availableAccounts} balance={balance} disabled={disabled} onUpdate={updateEntry} onUpdateFields={updateEntryFields} onAdd={addRow} onRemove={removeRow} uid={uid} />;
   }
-  return <ProcountorForm entries={entries} availableAccounts={availableAccounts} balance={balance} disabled={disabled} onUpdate={updateEntry} onAdd={addRow} onRemove={removeRow} uid={uid} />;
+  return <ProcountorForm entries={entries} availableAccounts={availableAccounts} balance={balance} disabled={disabled} onUpdate={updateEntry} onUpdateFields={updateEntryFields} onAdd={addRow} onRemove={removeRow} uid={uid} />;
 }
 
 // ─── Shared types for sub-forms ───────────────────────────────────────────────
@@ -64,6 +72,7 @@ interface FormProps {
   disabled: boolean;
   uid: string;
   onUpdate: (id: string, field: keyof StudentEntry, value: string | number) => void;
+  onUpdateFields: (id: string, fields: Partial<StudentEntry>) => void;
   onAdd: () => void;
   onRemove: (id: string) => void;
 }
@@ -151,7 +160,7 @@ function NetvisorForm({ entries, availableAccounts, balance, disabled, uid, onUp
 
 // ─── Procountor style ──────────────────────────────────────────────────────────
 
-function ProcountorForm({ entries, availableAccounts, balance, disabled, uid, onUpdate, onAdd, onRemove }: FormProps) {
+function ProcountorForm({ entries, availableAccounts, balance, disabled, uid, onUpdate, onUpdateFields, onAdd, onRemove }: FormProps) {
   return (
     <div className="jef jef-procountor">
       <table className="jef-table">
@@ -191,8 +200,7 @@ function ProcountorForm({ entries, availableAccounts, balance, disabled, uid, on
                   onChange={(ev) => {
                     const v = parseFloat(ev.target.value.replace(',', '.'));
                     if (!isNaN(v) && v > 0) {
-                      onUpdate(e.id, 'side', 'debet');
-                      onUpdate(e.id, 'amount', v);
+                      onUpdateFields(e.id, { side: 'debet', amount: v });
                     } else if (ev.target.value === '') {
                       onUpdate(e.id, 'amount', 0);
                     }
@@ -211,8 +219,7 @@ function ProcountorForm({ entries, availableAccounts, balance, disabled, uid, on
                   onChange={(ev) => {
                     const v = parseFloat(ev.target.value.replace(',', '.'));
                     if (!isNaN(v) && v > 0) {
-                      onUpdate(e.id, 'side', 'kredit');
-                      onUpdate(e.id, 'amount', v);
+                      onUpdateFields(e.id, { side: 'kredit', amount: v });
                     } else if (ev.target.value === '') {
                       onUpdate(e.id, 'amount', 0);
                     }

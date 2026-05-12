@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { VocabularyPhase, VocabularyPair } from '@/data/vocabulary/level-1';
 
 // ─── Colour palette for matched pairs (cycles through 5 colours) ──────────────
@@ -41,8 +41,13 @@ function PhaseView({
   const [wrongFlash, setWrongFlash] = useState<string | null>(null);
   const [expandedExample, setExpandedExample] = useState<string | null>(null);
 
-  const shuffledTerms = useMemo(() => shuffle(phase.pairs), [phase.pairs]);
-  const shuffledDefs = useMemo(() => shuffle(phase.pairs), [phase.pairs]);
+  const [shuffledTerms, setShuffledTerms] = useState<VocabularyPair[]>(phase.pairs);
+  const [shuffledDefs, setShuffledDefs] = useState<VocabularyPair[]>(phase.pairs);
+
+  useEffect(() => {
+    setShuffledTerms(shuffle(phase.pairs));
+    setShuffledDefs(shuffle(phase.pairs));
+  }, [phase.pairs]);
 
   const matchedIds = matched.map((m) => m.termId);
   const colorOf = (termId: string) =>

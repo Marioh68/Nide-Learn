@@ -32,5 +32,11 @@ jobs:
       - name: Type check
         run: pnpm tsc --noEmit
 
-      - name: Test
+      - name: Unit tests
         run: pnpm test
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E tests
+        run: pnpm test:e2e
