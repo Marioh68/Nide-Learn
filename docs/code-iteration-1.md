@@ -1,8 +1,9 @@
 # Iteraatio 1: Infrastruktuuri + Theme Provider + Sanastoharjoitus
 
-**Aloituspäivä:** _(täyttäkää aloittaessanne)_
-**Status:** Aloittamatta
+**Aloituspäivä:** 12.5.2026
+**Status:** Vaiheet 1–5 valmis — odotetaan opettajapalautetta
 **Vastuuhenkilö:** Marko + Claude Code
+**Staging-URL:** https://nide-learn.vercel.app/
 
 ---
 
@@ -151,12 +152,12 @@ Yksinkertainen sivu joka näyttää sanastoharjoituksen ja teemavalitsijan.
 
 Iteraatio 1 on valmis kun **kaikki** seuraavat täyttyvät:
 
-- [ ] Repo perustettu, CI/CD toimii (linter ja testi ajaa pull requesteissa)
-- [ ] Pinon valinnat vahvistettu Markon kanssa ja asennettu
-- [ ] Theme provider toimii: kolme teemaa (Nide, Netvisor, Procountor), vaihtuminen lennossa, ei sivun uudelleenlatausta
-- [ ] Sanastoharjoitus-komponentti rakennettu (15 tai 30 termiä — vahvistetaan Markolta)
-- [ ] Sanastoharjoitus toimii kaikissa kolmessa teemassa
-- [ ] Demo-sivu deployattu Vercel:iin (tai vastaavalle), staging-URL toimii
+- [x] Repo perustettu, CI/CD toimii (linter ja testi ajaa pull requesteissa)
+- [x] Pinon valinnat vahvistettu Markon kanssa ja asennettu
+- [x] Theme provider toimii: kolme teemaa (Nide, Netvisor, Procountor), vaihtuminen lennossa, ei sivun uudelleenlatausta
+- [x] Sanastoharjoitus-komponentti rakennettu (15 termiä, 3 erää — vahvistettu Markolta)
+- [x] Sanastoharjoitus toimii kaikissa kolmessa teemassa
+- [x] Demo-sivu deployattu Verceliin — https://nide-learn.vercel.app/
 - [ ] Vähintään yksi opettajakontakti on testannut sivun ja antanut palautteen
 - [ ] Saavutettavuus: harjoituksen voi tehdä näppäimistöllä, screen reader -tarkistus tehty
 
