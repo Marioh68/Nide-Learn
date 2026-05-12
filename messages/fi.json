@@ -1,0 +1,33 @@
+{
+  "common": {
+    "appName": "Nide Learn",
+    "loading": "Ladataan...",
+    "error": "Virhe",
+    "back": "Takaisin",
+    "next": "Seuraava",
+    "previous": "Edellinen",
+    "check": "Tarkista",
+    "showAnswer": "Näytä vastaus",
+    "correct": "Oikein!",
+    "incorrect": "Väärin, yritä uudelleen.",
+    "score": "Tulos"
+  },
+  "themes": {
+    "nide": "Nide",
+    "netvisor": "Netvisor-tyylinen",
+    "procountor": "Procountor-tyylinen"
+  },
+  "vocabulary": {
+    "title": "Sanastoharjoitus",
+    "description": "Yhdistä termi oikeaan määritelmään.",
+    "phase": "Erä {current} / {total}",
+    "matchPairs": "Yhdistä parit",
+    "allMatched": "Kaikki parit yhdistetty!",
+    "nextPhase": "Seuraava erä",
+    "results": {
+      "title": "Harjoitus valmis!",
+      "summary": "Sait {correct}/{total} oikein.",
+      "retry": "Aloita uudelleen"
+    }
+  }
+}

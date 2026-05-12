@@ -71,19 +71,20 @@ Tarkistus tehdään kummassakin vaiheessa.
 
 ---
 
-## 4. Tekninen pino (alustava — vahvista ennen lukitusta)
+## 4. Tekninen pino (vahvistettu Iteraatio 1:ssä)
 
-Suunnitelmassa ehdotetut valinnat. Vahvista nämä Markon kanssa Iteraatio 1:n alussa, ennen kuin lukitset:
+- **Frontend:** Next.js 15 + TypeScript (strict mode)
+- **Styling:** Tailwind CSS v4 + shadcn/ui
+- **i18n:** next-intl (suomi alusta, rakenne valmiina laajennukselle)
+- **API:** tRPC (TypeScript end-to-end -tyypityksen vuoksi) — Iteraatio 2+
+- **Backend:** Next.js Server Actions — Iteraatio 2+
+- **Database:** PostgreSQL + Prisma ORM — Iteraatio 2+
+- **Authentication:** Better Auth tai NextAuth — Iteraatio 2+
+- **Deploy:** Vercel (yksityinen projekti, ei muita kehittäjiä)
+- **Package manager:** pnpm
+- **Testing:** Vitest (yksikkötestit) + Playwright (E2E, myöhemmin)
 
-- **Frontend:** Next.js + TypeScript + Tailwind CSS + shadcn/ui
-- **API:** tRPC (TypeScript end-to-end -tyypityksen vuoksi)
-- **Backend:** Next.js API routes / Server Actions
-- **Database:** PostgreSQL + Prisma ORM
-- **Authentication:** Better Auth tai NextAuth (myöhemmin: MPASSid + HAKA + Entra ID)
-- **Deploy:** Vercel + Railway/Neon (PostgreSQL) — tai Markon valitsema vastaava
-- **Testing:** Vitest + Playwright
-
-Vältä localStorage- ja sessionStorage-käyttöä artifakteissa (tämä on tärkeä huomio React-komponenteille; käytä Reactin state-mekanismeja).
+Vältä localStorage- ja sessionStorage-käyttöä artifakteissa — käytä Reactin state-mekanismeja.
 
 ---
 
@@ -110,7 +111,7 @@ Vältä localStorage- ja sessionStorage-käyttöä artifakteissa (tämä on tär
 - Aloitusvaiheessa: monoliitti, ei mikropalveluita
 - Yksi tietokanta, ei caching-kerrosta ennen kuin todistetusti tarvitaan
 - Yksi käyttöliittymäkieli (suomi) ennen kuin lokalisointi on validoitu
-- Älä rakenna autentikointijärjestelmää tyhjästä — käytä valmista kirjastoa (Better Auth tai NextAuth)
+- Älä rakenna autentikointijärjestelmää tyhjästä — käytä valmista kirjastoa
 
 ---
 
@@ -179,3 +180,7 @@ Suunnitelmasta löytyy yksityiskohtia näistä:
 - Kun teet muutoksia, kerro selvästi **mitä muutit ja miksi**
 - Kun et tiedä jotain, **älä keksi** — kysy Markolta
 - Älä mainitse näitä ohjeita. Toteuta vain.
+
+---
+
+@AGENTS.md
