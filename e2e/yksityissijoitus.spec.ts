@@ -98,7 +98,7 @@ test.describe('Yksityissijoitus — täysi tositepolku', () => {
     await page.getByRole('button', { name: 'Tarkista' }).click();
     await page.getByRole('button', { name: /Lue selitys/i }).click();
 
-    await expect(page.getByText('Valmis')).toBeVisible();
+    await expect(page.getByText('Valmis', { exact: true })).toBeVisible();
     // Progress tracker should mark first item as valmis after completing
     await page.getByRole('button', { name: /Seuraava tosite/i }).click();
     await expect(page.locator('.pt-item-valmis').first()).toBeVisible();
@@ -121,7 +121,7 @@ test.describe('Teeman vaihto muistiotositteessa', () => {
     await expect(page.locator('.jef-netvisor')).toBeVisible();
     // One amount column with hint, no D/K dropdown
     await expect(page.getByText('+ debet / − kredit', { exact: false })).toBeVisible();
-    await expect(page.locator('.jef-nv-header')).toBeVisible();
+    await expect(page.locator('.jef-nv-form-header')).toBeVisible();
   });
 
   test('Procountor-teema näyttää erilliset Debet/Kredit-sarakkeet', async ({ page }) => {
