@@ -381,6 +381,20 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--shadow-sm);
 }
 
+/* Category badge shown above each T-account */
+.t-cat-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  text-align: center;
+}
+.t-cat-vastaavaa   { background: #dbeafe; color: #1e40af; }
+.t-cat-vastattavaa { background: #ede9fe; color: #5b21b6; }
+.t-cat-tuotot      { background: #dcfce7; color: #166534; }
+.t-cat-kulut       { background: #fee2e2; color: #991b1b; }
+
 .t-account-header {
   background: var(--color-primary);
   color: var(--color-primary-foreground);
@@ -561,9 +575,10 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap;
 }
 
+/* Netvisor: dark blue table header, white text — matches real Netvisor UI */
 .jef-netvisor .jef-th {
-  background: #e8f0f8;
-  color: #1c5fa6;
+  background: #1565c0;
+  color: #ffffff;
 }
 
 .jef-procountor .jef-th {
@@ -661,29 +676,123 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--color-success);
 }
 
-/* Netvisor-specific */
-.jef-nv-header {
+/* ── Netvisor form header (labeled field boxes) ──────────────────────────── */
+.jef-nv-form-header {
   display: flex;
-  align-items: center;
-  gap: 0.5rem 1rem;
-  padding: 0.4rem 0.75rem;
-  background: #1c5fa6;
-  color: #fff;
-  font-size: 0.8rem;
+  align-items: stretch;
+  gap: 0;
+  background: #f0f4fb;
+  border: 1px solid #c5d3e8;
+  border-bottom: none;
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   flex-wrap: wrap;
 }
-.jef-nv-label { opacity: 0.75; font-weight: 600; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.04em; }
-.jef-nv-value { font-weight: 600; }
-.jef-nv-grow { flex: 1; }
 
-.jef-th-hint { font-weight: 400; font-size: 0.68rem; opacity: 0.75; margin-left: 0.25rem; }
+.jef-nv-field {
+  display: flex;
+  flex-direction: column;
+  padding: 0.3rem 0.75rem 0.35rem;
+  border-right: 1px solid #c5d3e8;
+  min-width: 130px;
+}
+.jef-nv-field-selite { flex: 1; }
+.jef-nv-field-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #5a7aaa;
+  margin-bottom: 0.1rem;
+}
+.jef-nv-field-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1a2e4a;
+}
+.jef-nv-field-placeholder { color: #9aacca; font-weight: 400; }
 
+.jef-nv-autopost {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  margin-left: auto;
+}
+.jef-nv-autopost-label { font-size: 0.72rem; color: #5a7aaa; }
+.jef-nv-toggle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 3px;
+  background: #d0d8e8;
+  color: #5a7aaa;
+}
+
+/* ── Netvisor table header row ───────────────────────────────────────────── */
+.jef-nv-thead th { border-bottom: none; }
+
+.jef-nv-th-handle { width: 20px; }
+
+/* ── Netvisor drag handle cell ───────────────────────────────────────────── */
+.jef-nv-handle-cell {
+  color: #b0bec5;
+  font-size: 0.9rem;
+  letter-spacing: -2px;
+  text-align: center;
+  cursor: default;
+  user-select: none;
+  width: 20px;
+}
+
+/* ── Netvisor footer row ─────────────────────────────────────────────────── */
+.jef-nv-total-row td {
+  padding: 0.35rem 0.6rem;
+  border-top: 2px solid #1565c0;
+  background: #f0f4fb;
+  font-size: 0.82rem;
+}
+.jef-nv-total-label {
+  font-weight: 700;
+  color: #1a2e4a;
+}
+.jef-nv-total-amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.jef-nv-dk-cell {
+  color: #5a7aaa;
+  font-size: 0.78rem;
+}
+.jef-nv-dk-val {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: #1a2e4a;
+}
+
+/* ── Netvisor bottom action row ──────────────────────────────────────────── */
+.jef-nv-bottom {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.5rem;
+  background: #f5f7fb;
+  border: 1px solid #c5d3e8;
+  border-top: none;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+/* Netvisor add-row button matches Netvisor chrome */
+.jef-netvisor .jef-add-btn {
+  background: #ffffff;
+  color: #1565c0;
+  border-color: #1565c0;
+}
+.jef-netvisor .jef-add-btn:hover { background: #e8f0fb; }
+
+/* ── Shared ──────────────────────────────────────────────────────────────── */
+.jef-th-hint { font-weight: 400; font-size: 0.68rem; opacity: 0.8; margin-left: 0.25rem; }
 .jef-amount-kredit { color: #c0392b; }
-
-.jef-nv-total-row td { padding: 0.3rem 0.5rem; border-top: 2px solid var(--color-border); background: var(--color-surface-raised); font-size: 0.82rem; }
-.jef-nv-total-label { font-weight: 700; color: var(--color-text-muted); }
-.jef-nv-total-amount { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
 
 /* ─── MonthIntro ─────────────────────────────────────────────────────────── */
 

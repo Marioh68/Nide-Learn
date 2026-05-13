@@ -81,7 +81,6 @@ interface FormProps {
 // One amount column: positive = debet, negative = kredit (no D/K dropdown)
 
 function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, onAdd, onRemove }: FormProps) {
-  // Display value: debet → positive, kredit → negative
   function displayAmount(e: StudentEntry): string {
     if (e.amount === 0) return '';
     return e.side === 'kredit' ? String(-e.amount) : String(e.amount);
@@ -99,38 +98,50 @@ function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, on
     else onUpdateFields(id, { amount: 0 });
   }
 
-  const netBalance = entries.reduce(
-    (sum, e) => sum + (e.side === 'debet' ? e.amount : -e.amount),
-    0,
-  );
+  const totalDebet  = entries.reduce((s, e) => s + (e.side === 'debet'  ? e.amount : 0), 0);
+  const totalKredit = entries.reduce((s, e) => s + (e.side === 'kredit' ? e.amount : 0), 0);
+  const netBalance  = totalDebet - totalKredit;
+  const balanced    = Math.abs(netBalance) < 0.005 && entries.length > 0;
   const fmt = (n: number) => n.toLocaleString('fi-FI', { minimumFractionDigits: 2 });
 
   return (
     <div className="jef jef-netvisor">
-      {/* Netvisor header bar */}
-      <div className="jef-nv-header">
-        <span className="jef-nv-label">Tositelaji</span>
-        <span className="jef-nv-value">MU Muut</span>
-        <span className="jef-nv-label">Selite</span>
-        <span className="jef-nv-value jef-nv-grow">—</span>
+
+      {/* ── Netvisor-style form header ───────────────────────────────────── */}
+      <div className="jef-nv-form-header">
+        <div className="jef-nv-field">
+          <span className="jef-nv-field-label">Tositelaji</span>
+          <span className="jef-nv-field-value">MU Muut</span>
+        </div>
+        <div className="jef-nv-field jef-nv-field-selite">
+          <span className="jef-nv-field-label">Selite</span>
+          <span className="jef-nv-field-value jef-nv-field-placeholder">—</span>
+        </div>
+        <div className="jef-nv-autopost">
+          <span className="jef-nv-autopost-label">Automaattinen vastakirjaus</span>
+          <span className="jef-nv-toggle jef-nv-toggle-off">Off</span>
+        </div>
       </div>
 
+      {/* ── Entry table ──────────────────────────────────────────────────── */}
       <table className="jef-table">
         <thead>
-          <tr>
+          <tr className="jef-nv-thead">
+            <th className="jef-th jef-nv-th-handle" aria-hidden="true" />
             <th className="jef-th jef-col-account">Tili</th>
             <th className="jef-th jef-col-amount">
               Summa
               <span className="jef-th-hint"> (+ debet / − kredit)</span>
             </th>
             <th className="jef-th jef-col-alv">ALV-%</th>
-            <th className="jef-th jef-col-alv">ALV-laji</th>
+            <th className="jef-th jef-col-alv">ALV-tunnus</th>
             {!disabled && <th className="jef-th jef-col-action" />}
           </tr>
         </thead>
         <tbody>
           {entries.map((e, i) => (
             <tr key={e.id} className="jef-row">
+              <td className="jef-td jef-nv-handle-cell" aria-hidden="true">≡</td>
               <td className="jef-td">
                 <select
                   value={e.account}
@@ -157,8 +168,8 @@ function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, on
                   placeholder="0,00"
                 />
               </td>
+              <td className="jef-td jef-alv-locked">0 %</td>
               <td className="jef-td jef-alv-locked">—</td>
-              <td className="jef-td jef-alv-locked">Ei alv-käs.</td>
               {!disabled && (
                 <td className="jef-td jef-action-cell">
                   <button onClick={() => onRemove(e.id)} className="jef-remove" aria-label="Poista rivi">×</button>
@@ -169,17 +180,23 @@ function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, on
         </tbody>
         <tfoot>
           <tr className="jef-nv-total-row">
-            <td className="jef-td jef-nv-total-label">Erotus</td>
-            <td className={`jef-td jef-nv-total-amount ${Math.abs(netBalance) < 0.005 && entries.length > 0 ? 'balance-ok' : entries.length > 0 ? 'balance-err' : ''}`}>
+            <td className="jef-nv-total-label" colSpan={2}>Erotus</td>
+            <td className={`jef-nv-total-amount ${balanced ? 'balance-ok' : entries.length > 0 ? 'balance-err' : ''}`}>
               {fmt(netBalance)} €
             </td>
-            <td colSpan={disabled ? 2 : 3} />
+            <td className="jef-nv-dk-cell" colSpan={disabled ? 2 : 3}>
+              Debet / Kredit:&nbsp;
+              <span className="jef-nv-dk-val">{fmt(totalDebet)} / {fmt(totalKredit)}</span>
+            </td>
           </tr>
         </tfoot>
       </table>
 
+      {/* ── Bottom action row ─────────────────────────────────────────────── */}
       {!disabled && (
-        <button onClick={onAdd} className="jef-add-btn">+ Lisää rivi</button>
+        <div className="jef-nv-bottom">
+          <button onClick={onAdd} className="jef-add-btn">+ Lisää rivi</button>
+        </div>
       )}
     </div>
   );

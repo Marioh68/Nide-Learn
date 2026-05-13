@@ -3,7 +3,7 @@
 import { useState, useId } from 'react';
 import { calcBalance } from '@/lib/checkExercise';
 import { getAvailableAccounts } from '@/data/accounts/chart-of-accounts';
-import type { StudentEntry, ExerciseSide } from '@/types/exercises';
+import type { StudentEntry, ExerciseSide, AccountCategory } from '@/types/exercises';
 
 interface LedgerGridProps {
   monthOffset: number;
@@ -15,9 +15,17 @@ interface LedgerGridProps {
 interface TAccount {
   numero: string;
   nimi: string;
+  kategoria?: AccountCategory;
   debet: StudentEntry[];
   kredit: StudentEntry[];
 }
+
+const KATEGORIA_INFO: Record<AccountCategory, { label: string; cls: string }> = {
+  vastaavaa:   { label: 'Tase · Vastaavaa',         cls: 't-cat-vastaavaa' },
+  vastattavaa: { label: 'Tase · Vastattavaa',        cls: 't-cat-vastattavaa' },
+  tuotot:      { label: 'Tuloslaskelma · Tuotot',    cls: 't-cat-tuotot' },
+  kulut:       { label: 'Tuloslaskelma · Kulut',     cls: 't-cat-kulut' },
+};
 
 function buildTAccounts(entries: StudentEntry[], accounts: ReturnType<typeof getAvailableAccounts>): TAccount[] {
   const map = new Map<string, TAccount>();
@@ -27,6 +35,7 @@ function buildTAccounts(entries: StudentEntry[], accounts: ReturnType<typeof get
       map.set(e.account, {
         numero: e.account,
         nimi: tili?.nimi ?? e.account,
+        kategoria: tili?.kategoria,
         debet: [],
         kredit: [],
       });
@@ -77,8 +86,13 @@ export function LedgerGrid({ monthOffset, entries, onChange, disabled = false }:
         <p className="ledger-empty">Ei kirjauksia vielä. Lisää kirjaus alta.</p>
       ) : (
         <div className="t-accounts-row">
-          {tAccounts.map((t) => (
+          {tAccounts.map((t) => {
+            const katInfo = t.kategoria ? KATEGORIA_INFO[t.kategoria] : null;
+            return (
             <div key={t.numero} className="t-account">
+              {katInfo && (
+                <div className={`t-cat-badge ${katInfo.cls}`}>{katInfo.label}</div>
+              )}
               <div className="t-account-header">{t.numero} {t.nimi}</div>
               <div className="t-account-body">
                 {/* Debet side */}
@@ -119,7 +133,8 @@ export function LedgerGrid({ monthOffset, entries, onChange, disabled = false }:
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
