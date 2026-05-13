@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useId } from 'react';
+import { useId } from 'react';
 import { getAvailableAccounts } from '@/data/accounts/chart-of-accounts';
 import { calcBalance } from '@/lib/checkExercise';
-import type { StudentEntry, ExerciseSide } from '@/types/exercises';
+import type { StudentEntry } from '@/types/exercises';
 import type { Theme } from '@/components/ThemeProvider';
 
 interface JournalEntryFormProps {
@@ -78,18 +78,53 @@ interface FormProps {
 }
 
 // ─── Netvisor style ────────────────────────────────────────────────────────────
+// One amount column: positive = debet, negative = kredit (no D/K dropdown)
 
-function NetvisorForm({ entries, availableAccounts, balance, disabled, uid, onUpdate, onAdd, onRemove }: FormProps) {
+function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, onAdd, onRemove }: FormProps) {
+  // Display value: debet → positive, kredit → negative
+  function displayAmount(e: StudentEntry): string {
+    if (e.amount === 0) return '';
+    return e.side === 'kredit' ? String(-e.amount) : String(e.amount);
+  }
+
+  function handleAmountChange(id: string, raw: string) {
+    const normalised = raw.replace(',', '.');
+    const v = parseFloat(normalised);
+    if (isNaN(v) || normalised === '' || normalised === '-') {
+      onUpdateFields(id, { amount: 0 });
+      return;
+    }
+    if (v > 0) onUpdateFields(id, { side: 'debet', amount: v });
+    else if (v < 0) onUpdateFields(id, { side: 'kredit', amount: Math.abs(v) });
+    else onUpdateFields(id, { amount: 0 });
+  }
+
+  const netBalance = entries.reduce(
+    (sum, e) => sum + (e.side === 'debet' ? e.amount : -e.amount),
+    0,
+  );
+  const fmt = (n: number) => n.toLocaleString('fi-FI', { minimumFractionDigits: 2 });
+
   return (
     <div className="jef jef-netvisor">
+      {/* Netvisor header bar */}
+      <div className="jef-nv-header">
+        <span className="jef-nv-label">Tositelaji</span>
+        <span className="jef-nv-value">MU Muut</span>
+        <span className="jef-nv-label">Selite</span>
+        <span className="jef-nv-value jef-nv-grow">—</span>
+      </div>
+
       <table className="jef-table">
         <thead>
           <tr>
             <th className="jef-th jef-col-account">Tili</th>
-            <th className="jef-th jef-col-side">D/K</th>
-            <th className="jef-th jef-col-amount">Summa</th>
+            <th className="jef-th jef-col-amount">
+              Summa
+              <span className="jef-th-hint"> (+ debet / − kredit)</span>
+            </th>
             <th className="jef-th jef-col-alv">ALV-%</th>
-            <th className="jef-th jef-col-alv">ALV-koodi</th>
+            <th className="jef-th jef-col-alv">ALV-laji</th>
             {!disabled && <th className="jef-th jef-col-action" />}
           </tr>
         </thead>
@@ -99,7 +134,7 @@ function NetvisorForm({ entries, availableAccounts, balance, disabled, uid, onUp
               <td className="jef-td">
                 <select
                   value={e.account}
-                  onChange={(ev) => onUpdate(e.id, 'account', ev.target.value)}
+                  onChange={(ev) => onUpdateFields(e.id, { account: ev.target.value })}
                   disabled={disabled}
                   aria-label={`Rivi ${i + 1}: tili`}
                   className="jef-select"
@@ -111,34 +146,19 @@ function NetvisorForm({ entries, availableAccounts, balance, disabled, uid, onUp
                 </select>
               </td>
               <td className="jef-td">
-                <select
-                  value={e.side}
-                  onChange={(ev) => onUpdate(e.id, 'side', ev.target.value as ExerciseSide)}
-                  disabled={disabled}
-                  aria-label={`Rivi ${i + 1}: puoli`}
-                  className="jef-select jef-side-select"
-                >
-                  <option value="debet">D</option>
-                  <option value="kredit">K</option>
-                </select>
-              </td>
-              <td className="jef-td">
                 <input
                   type="text"
                   inputMode="decimal"
-                  value={e.amount === 0 ? '' : e.amount}
-                  onChange={(ev) => {
-                    const v = parseFloat(ev.target.value.replace(',', '.'));
-                    onUpdate(e.id, 'amount', isNaN(v) ? 0 : v);
-                  }}
+                  value={displayAmount(e)}
+                  onChange={(ev) => handleAmountChange(e.id, ev.target.value)}
                   disabled={disabled}
                   aria-label={`Rivi ${i + 1}: summa`}
-                  className="jef-input jef-amount"
+                  className={`jef-input jef-amount ${e.side === 'kredit' && e.amount > 0 ? 'jef-amount-kredit' : ''}`}
                   placeholder="0,00"
                 />
               </td>
-              <td className="jef-td jef-alv-locked" aria-label="ALV-% (ei käytössä)">—</td>
-              <td className="jef-td jef-alv-locked" aria-label="ALV-koodi (ei käytössä)">—</td>
+              <td className="jef-td jef-alv-locked">—</td>
+              <td className="jef-td jef-alv-locked">Ei alv-käs.</td>
               {!disabled && (
                 <td className="jef-td jef-action-cell">
                   <button onClick={() => onRemove(e.id)} className="jef-remove" aria-label="Poista rivi">×</button>
@@ -147,20 +167,27 @@ function NetvisorForm({ entries, availableAccounts, balance, disabled, uid, onUp
             </tr>
           ))}
         </tbody>
+        <tfoot>
+          <tr className="jef-nv-total-row">
+            <td className="jef-td jef-nv-total-label">Erotus</td>
+            <td className={`jef-td jef-nv-total-amount ${Math.abs(netBalance) < 0.005 && entries.length > 0 ? 'balance-ok' : entries.length > 0 ? 'balance-err' : ''}`}>
+              {fmt(netBalance)} €
+            </td>
+            <td colSpan={disabled ? 2 : 3} />
+          </tr>
+        </tfoot>
       </table>
 
       {!disabled && (
         <button onClick={onAdd} className="jef-add-btn">+ Lisää rivi</button>
       )}
-
-      <BalanceFooter balance={balance} entryCount={entries.length} />
     </div>
   );
 }
 
 // ─── Procountor style ──────────────────────────────────────────────────────────
 
-function ProcountorForm({ entries, availableAccounts, balance, disabled, uid, onUpdate, onUpdateFields, onAdd, onRemove }: FormProps) {
+function ProcountorForm({ entries, availableAccounts, balance, disabled, onUpdate, onUpdateFields, onAdd, onRemove }: FormProps) {
   return (
     <div className="jef jef-procountor">
       <table className="jef-table">

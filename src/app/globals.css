@@ -661,6 +661,30 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--color-success);
 }
 
+/* Netvisor-specific */
+.jef-nv-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.4rem 0.75rem;
+  background: #1c5fa6;
+  color: #fff;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  flex-wrap: wrap;
+}
+.jef-nv-label { opacity: 0.75; font-weight: 600; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.04em; }
+.jef-nv-value { font-weight: 600; }
+.jef-nv-grow { flex: 1; }
+
+.jef-th-hint { font-weight: 400; font-size: 0.68rem; opacity: 0.75; margin-left: 0.25rem; }
+
+.jef-amount-kredit { color: #c0392b; }
+
+.jef-nv-total-row td { padding: 0.3rem 0.5rem; border-top: 2px solid var(--color-border); background: var(--color-surface-raised); font-size: 0.82rem; }
+.jef-nv-total-label { font-weight: 700; color: var(--color-text-muted); }
+.jef-nv-total-amount { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+
 /* ─── MonthIntro ─────────────────────────────────────────────────────────── */
 
 .month-intro {
