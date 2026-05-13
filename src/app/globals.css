@@ -919,19 +919,58 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
-.ns-actions { display: flex; justify-content: center; }
+.ns-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
 .ns-restart-btn {
   padding: 0.6rem 1.5rem;
-  background: var(--color-primary);
-  color: var(--color-primary-foreground);
-  border: none;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
   border-radius: var(--radius-btn);
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s;
 }
-.ns-restart-btn:hover { background: var(--color-primary-hover); }
+.ns-restart-btn:hover { background: var(--color-secondary); }
+
+.ns-next-btn {
+  padding: 0.6rem 1.75rem;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-btn);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ns-next-btn:hover { background: var(--color-primary-hover); }
+
+/* Opening balances in NovemberSummary */
+.ns-balances-intro {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.55;
+}
+.ns-balances-table { margin-top: 0.25rem; }
+.ns-th-right { text-align: right; }
+.ns-td-right { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.ns-td-muted { color: var(--color-text-muted); font-style: italic; }
+.ns-balance-pos { color: #1c5fa6; }
+.ns-balance-neg { color: var(--color-error); }
+
+/* December hero variant */
+.ns-hero-dec .ns-hero-icon {
+  background: #fff3e0;
+  border-color: #e65100;
+  color: #e65100;
+}
 
 /* ─── MonthIntro ─────────────────────────────────────────────────────────── */
 
@@ -995,6 +1034,45 @@ h1, h2, h3, h4, h5, h6 {
   transition: background 0.15s;
 }
 .month-intro-btn:hover { background: var(--color-primary-hover); }
+
+/* December intro — opening balances box */
+.dec-intro-balances {
+  width: 100%;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+.dec-intro-balances-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+.dec-intro-balance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+.dec-intro-balance-account {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+.dec-intro-balance-amount {
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.dec-intro-pos { color: #1c5fa6; }
+.dec-intro-neg { color: var(--color-error); }
 
 /* ─── MicroContent ───────────────────────────────────────────────────────── */
 
