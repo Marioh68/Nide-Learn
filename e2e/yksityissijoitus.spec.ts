@@ -6,7 +6,7 @@ test.describe('Yksityissijoitus — täysi tositepolku', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // Navigate to Tositekirjaus tab
-    await page.getByRole('button', { name: /Tositekirjaus/i }).click();
+    await page.getByRole('button', { name: 'Tositekirjaus — Marraskuu' }).click();
     // MonthIntro must appear
     await expect(page.getByRole('heading', { name: /Marraskuu 2026/ })).toBeVisible();
     // Start exercises
@@ -108,7 +108,7 @@ test.describe('Yksityissijoitus — täysi tositepolku', () => {
 test.describe('Teeman vaihto muistiotositteessa', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: /Tositekirjaus/i }).click();
+    await page.getByRole('button', { name: 'Tositekirjaus — Marraskuu' }).click();
     await page.getByRole('button', { name: /Aloita marraskuun kirjaukset/i }).click();
     await page.getByRole('button', { name: /Siirry kirjaukseen/i }).click();
     await addCorrectLedgerEntries(page);
@@ -137,7 +137,7 @@ test.describe('Teeman vaihto muistiotositteessa', () => {
 test.describe('Saavutettavuus', () => {
   test('tiliristikko toimii näppäimistöllä', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: /Tositekirjaus/i }).click();
+    await page.getByRole('button', { name: 'Tositekirjaus — Marraskuu' }).click();
     await page.getByRole('button', { name: /Aloita marraskuun kirjaukset/i }).click();
     await page.getByRole('button', { name: /Siirry kirjaukseen/i }).click();
 
@@ -155,7 +155,7 @@ test.describe('Saavutettavuus', () => {
 
   test('MicroContent-popup sulkeutuu Esc-näppäimellä', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: /Tositekirjaus/i }).click();
+    await page.getByRole('button', { name: 'Tositekirjaus — Marraskuu' }).click();
     await page.getByRole('button', { name: /Aloita marraskuun kirjaukset/i }).click();
     await page.getByRole('button', { name: /Siirry kirjaukseen/i }).click();
 
@@ -191,7 +191,7 @@ test.describe('Saavutettavuus', () => {
 
   test('edistymistrakker on näppäimistöllä navigoitava', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: /Tositekirjaus/i }).click();
+    await page.getByRole('button', { name: 'Tositekirjaus — Marraskuu' }).click();
     await page.getByRole('button', { name: /Aloita marraskuun kirjaukset/i }).click();
 
     // ProgressTracker nav has role=navigation
