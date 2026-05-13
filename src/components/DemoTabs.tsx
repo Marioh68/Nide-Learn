@@ -16,18 +16,22 @@ export function DemoTabs() {
   const [tab, setTab] = useState<Tab>('sanasto');
   const [introSeen, setIntroSeen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [allDone, setAllDone] = useState(false);
   const [statuses, setStatuses] = useState<DocumentStatus[]>(
     novemberPhase1Exercises.map(() => 'aloittamatta'),
   );
   const { theme } = useTheme();
 
   function handleComplete() {
+    const isLast = currentIndex === novemberPhase1Exercises.length - 1;
     setStatuses((prev) => {
       const next = [...prev];
       next[currentIndex] = 'valmis';
       return next;
     });
-    if (currentIndex < novemberPhase1Exercises.length - 1) {
+    if (isLast) {
+      setAllDone(true);
+    } else {
       setCurrentIndex((i) => i + 1);
     }
   }
@@ -77,7 +81,7 @@ export function DemoTabs() {
         </div>
       )}
 
-      {tab === 'tositekirjaus' && introSeen && (
+      {tab === 'tositekirjaus' && introSeen && !allDone && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
             <ProgressTracker
@@ -97,6 +101,92 @@ export function DemoTabs() {
           </div>
         </div>
       )}
+
+      {tab === 'tositekirjaus' && introSeen && allDone && (
+        <div className="demo-pane">
+          <NovemberSummary onRestart={() => { setAllDone(false); setCurrentIndex(0); setStatuses(novemberPhase1Exercises.map(() => 'aloittamatta')); }} />
+        </div>
+      )}
     </>
+  );
+}
+
+// ─── November summary screen ──────────────────────────────────────────────────
+
+const NOVEMBER_RECAP = [
+  { id: 'ys-001',    type: 'Yksityissijoitus',       debet: '1910 Pankkitili',              kredit: '2080 Yksityistili',           note: '' },
+  { id: 'yn-001',    type: 'Yksityisnosto',           debet: '2080 Yksityistili',            kredit: '1910 Pankkitili',             note: '' },
+  { id: '2026-001',  type: 'Myyntilasku',             debet: '1700 Myyntisaamiset',          kredit: '3000 Myynti, palvelumyynti',  note: '' },
+  { id: 'kuitti-001',type: 'Kuitti (toimistotarv.)',  debet: '8400 Liiketoiminnan muut kulut', kredit: '1910 Pankkitili',           note: '← ei 4000' },
+  { id: 'ac-2611',   type: 'Ostolasku (kortti)',      debet: '8390 Tietotekniikkakulut',     kredit: '1910 Pankkitili',             note: '' },
+  { id: 'lp-1142',   type: 'Ostolasku (maksuehto)',   debet: '8400 Liiketoiminnan muut kulut', kredit: '2520 Ostovelat',           note: '' },
+  { id: 'tiliote-001',type: 'Tiliote — myyntisuoritus', debet: '1910 Pankkitili',            kredit: '1700 Myyntisaamiset',         note: '' },
+  { id: 'tiliote-002',type: 'Tiliote — ostovelan maksu', debet: '2520 Ostovelat',            kredit: '1910 Pankkitili',             note: '' },
+];
+
+function NovemberSummary({ onRestart }: { onRestart: () => void }) {
+  return (
+    <div className="ns-root">
+      <div className="ns-hero">
+        <div className="ns-hero-icon">✓</div>
+        <h2 className="ns-hero-title">Marraskuun kirjaukset valmis!</h2>
+        <p className="ns-hero-sub">Kati Mäkisen tmi — 8 tositetta kirjattu</p>
+      </div>
+
+      {/* Recap table */}
+      <div className="ns-section">
+        <h3 className="ns-section-title">Kirjausten koonti</h3>
+        <table className="ns-table">
+          <thead>
+            <tr>
+              <th className="ns-th">Tosite</th>
+              <th className="ns-th">Debet</th>
+              <th className="ns-th">Kredit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {NOVEMBER_RECAP.map((r) => (
+              <tr key={r.id} className="ns-tr">
+                <td className="ns-td ns-td-type">{r.type}</td>
+                <td className="ns-td">{r.debet}{r.note && <span className="ns-note"> {r.note}</span>}</td>
+                <td className="ns-td">{r.kredit}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pedagogical note: 4000 vs 8400 */}
+      <div className="ns-section">
+        <h3 className="ns-section-title">Muista: 4000 vai 8400?</h3>
+        <div className="ns-compare">
+          <div className="ns-compare-card ns-compare-4000">
+            <div className="ns-compare-account">4000 Aineet ja tarvikkeet</div>
+            <p className="ns-compare-rule">
+              <strong>Muuttuva kulu</strong> — tavara myydään asiakkaalle tai käytetään
+              suoraan myytävän tuotteen valmistukseen.
+            </p>
+            <p className="ns-compare-example">Esim. puusepän puu, leipomon jauhot, mainostoimiston sublimaatiopaita asiakkaalle.</p>
+          </div>
+          <div className="ns-compare-card ns-compare-8400">
+            <div className="ns-compare-account">8400 Liiketoiminnan muut kulut</div>
+            <p className="ns-compare-rule">
+              <strong>Yleiskulu</strong> — kulu ei vaikuta suoraan liikevaihtoon eikä päädy
+              asiakkaan tuotteeseen.
+            </p>
+            <p className="ns-compare-example">Esim. toimistotarvikkeet, lehti-ilmoitukset, vakuutukset, konttorivuokra.</p>
+          </div>
+        </div>
+        <p className="ns-compare-tip">
+          Katin kyniä ja muistilappuja ei myydä asiakkaalle → <strong>8400</strong>, ei 4000.
+        </p>
+      </div>
+
+      <div className="ns-actions">
+        <button className="ns-restart-btn" onClick={onRestart}>
+          Aloita marraskuu uudelleen
+        </button>
+      </div>
+    </div>
   );
 }

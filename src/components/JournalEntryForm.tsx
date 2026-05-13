@@ -1,6 +1,6 @@
 'use client';
 
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { getAvailableAccounts } from '@/data/accounts/chart-of-accounts';
 import { calcBalance } from '@/lib/checkExercise';
 import type { StudentEntry } from '@/types/exercises';
@@ -81,12 +81,17 @@ interface FormProps {
 // One amount column: positive = debet, negative = kredit (no D/K dropdown)
 
 function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, onAdd, onRemove }: FormProps) {
-  function displayAmount(e: StudentEntry): string {
+  // rawAmounts stores the string the user is actively typing so that partial
+  // values like "-" or "99," are not reset by the controlled-input cycle.
+  const [rawAmounts, setRawAmounts] = useState<Record<string, string>>({});
+
+  function committedDisplay(e: StudentEntry): string {
     if (e.amount === 0) return '';
     return e.side === 'kredit' ? String(-e.amount) : String(e.amount);
   }
 
   function handleAmountChange(id: string, raw: string) {
+    setRawAmounts((prev) => ({ ...prev, [id]: raw }));
     const normalised = raw.replace(',', '.');
     const v = parseFloat(normalised);
     if (isNaN(v) || normalised === '' || normalised === '-') {
@@ -96,6 +101,10 @@ function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, on
     if (v > 0) onUpdateFields(id, { side: 'debet', amount: v });
     else if (v < 0) onUpdateFields(id, { side: 'kredit', amount: Math.abs(v) });
     else onUpdateFields(id, { amount: 0 });
+  }
+
+  function commitRaw(id: string) {
+    setRawAmounts((prev) => { const n = { ...prev }; delete n[id]; return n; });
   }
 
   const totalDebet  = entries.reduce((s, e) => s + (e.side === 'debet'  ? e.amount : 0), 0);
@@ -160,8 +169,9 @@ function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, on
                 <input
                   type="text"
                   inputMode="decimal"
-                  value={displayAmount(e)}
+                  value={rawAmounts[e.id] !== undefined ? rawAmounts[e.id] : committedDisplay(e)}
                   onChange={(ev) => handleAmountChange(e.id, ev.target.value)}
+                  onBlur={() => commitRaw(e.id)}
                   disabled={disabled}
                   aria-label={`Rivi ${i + 1}: summa`}
                   className={`jef-input jef-amount ${e.side === 'kredit' && e.amount > 0 ? 'jef-amount-kredit' : ''}`}
@@ -205,6 +215,14 @@ function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, on
 // ─── Procountor style ──────────────────────────────────────────────────────────
 
 function ProcountorForm({ entries, availableAccounts, balance, disabled, onUpdate, onUpdateFields, onAdd, onRemove }: FormProps) {
+  const [rawDebets, setRawDebets]   = useState<Record<string, string>>({});
+  const [rawKredits, setRawKredits] = useState<Record<string, string>>({});
+
+  function clearRaw(id: string, col: 'debet' | 'kredit') {
+    if (col === 'debet')  setRawDebets((p)  => { const n = { ...p }; delete n[id]; return n; });
+    else                  setRawKredits((p) => { const n = { ...p }; delete n[id]; return n; });
+  }
+
   return (
     <div className="jef jef-procountor">
       <table className="jef-table">
@@ -240,15 +258,15 @@ function ProcountorForm({ entries, availableAccounts, balance, disabled, onUpdat
                 <input
                   type="text"
                   inputMode="decimal"
-                  value={e.side === 'debet' && e.amount !== 0 ? e.amount : ''}
+                  value={rawDebets[e.id] !== undefined ? rawDebets[e.id] : (e.side === 'debet' && e.amount !== 0 ? String(e.amount) : '')}
                   onChange={(ev) => {
-                    const v = parseFloat(ev.target.value.replace(',', '.'));
-                    if (!isNaN(v) && v > 0) {
-                      onUpdateFields(e.id, { side: 'debet', amount: v });
-                    } else if (ev.target.value === '') {
-                      onUpdate(e.id, 'amount', 0);
-                    }
+                    const raw = ev.target.value;
+                    setRawDebets((p) => ({ ...p, [e.id]: raw }));
+                    const v = parseFloat(raw.replace(',', '.'));
+                    if (!isNaN(v) && v > 0) onUpdateFields(e.id, { side: 'debet', amount: v });
+                    else if (raw === '') onUpdate(e.id, 'amount', 0);
                   }}
+                  onBlur={() => clearRaw(e.id, 'debet')}
                   disabled={disabled}
                   aria-label={`Rivi ${i + 1}: debet`}
                   className="jef-input jef-amount"
@@ -259,15 +277,15 @@ function ProcountorForm({ entries, availableAccounts, balance, disabled, onUpdat
                 <input
                   type="text"
                   inputMode="decimal"
-                  value={e.side === 'kredit' && e.amount !== 0 ? e.amount : ''}
+                  value={rawKredits[e.id] !== undefined ? rawKredits[e.id] : (e.side === 'kredit' && e.amount !== 0 ? String(e.amount) : '')}
                   onChange={(ev) => {
-                    const v = parseFloat(ev.target.value.replace(',', '.'));
-                    if (!isNaN(v) && v > 0) {
-                      onUpdateFields(e.id, { side: 'kredit', amount: v });
-                    } else if (ev.target.value === '') {
-                      onUpdate(e.id, 'amount', 0);
-                    }
+                    const raw = ev.target.value;
+                    setRawKredits((p) => ({ ...p, [e.id]: raw }));
+                    const v = parseFloat(raw.replace(',', '.'));
+                    if (!isNaN(v) && v > 0) onUpdateFields(e.id, { side: 'kredit', amount: v });
+                    else if (raw === '') onUpdate(e.id, 'amount', 0);
                   }}
+                  onBlur={() => clearRaw(e.id, 'kredit')}
                   disabled={disabled}
                   aria-label={`Rivi ${i + 1}: kredit`}
                   className="jef-input jef-amount"
