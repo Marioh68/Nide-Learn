@@ -44,10 +44,9 @@ function PhaseView({
   const [shuffledTerms, setShuffledTerms] = useState<VocabularyPair[]>(phase.pairs);
   const [shuffledDefs, setShuffledDefs] = useState<VocabularyPair[]>(phase.pairs);
 
+  // Shuffle must run client-side only to avoid SSR hydration mismatch (Math.random)
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: shuffle runs client-side only to avoid SSR hydration mismatch
-    setShuffledTerms(shuffle(phase.pairs));
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setShuffledTerms(shuffle(phase.pairs)); // eslint-disable-line react-hooks/set-state-in-effect
     setShuffledDefs(shuffle(phase.pairs));
   }, [phase.pairs]);
 

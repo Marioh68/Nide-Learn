@@ -1,6 +1,6 @@
 'use client';
 
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { getAvailableAccounts } from '@/data/accounts/chart-of-accounts';
 import { calcBalance } from '@/lib/checkExercise';
 import type { StudentEntry } from '@/types/exercises';
@@ -81,13 +81,17 @@ interface FormProps {
 // One amount column: positive = debet, negative = kredit (no D/K dropdown)
 
 function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, onAdd, onRemove }: FormProps) {
-  // Display value: debet → positive, kredit → negative
-  function displayAmount(e: StudentEntry): string {
+  // rawAmounts stores the string the user is actively typing so that partial
+  // values like "-" or "99," are not reset by the controlled-input cycle.
+  const [rawAmounts, setRawAmounts] = useState<Record<string, string>>({});
+
+  function committedDisplay(e: StudentEntry): string {
     if (e.amount === 0) return '';
     return e.side === 'kredit' ? String(-e.amount) : String(e.amount);
   }
 
   function handleAmountChange(id: string, raw: string) {
+    setRawAmounts((prev) => ({ ...prev, [id]: raw }));
     const normalised = raw.replace(',', '.');
     const v = parseFloat(normalised);
     if (isNaN(v) || normalised === '' || normalised === '-') {
@@ -99,38 +103,54 @@ function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, on
     else onUpdateFields(id, { amount: 0 });
   }
 
-  const netBalance = entries.reduce(
-    (sum, e) => sum + (e.side === 'debet' ? e.amount : -e.amount),
-    0,
-  );
+  function commitRaw(id: string) {
+    setRawAmounts((prev) => { const n = { ...prev }; delete n[id]; return n; });
+  }
+
+  const totalDebet  = entries.reduce((s, e) => s + (e.side === 'debet'  ? e.amount : 0), 0);
+  const totalKredit = entries.reduce((s, e) => s + (e.side === 'kredit' ? e.amount : 0), 0);
+  const netBalance  = totalDebet - totalKredit;
+  const balanced    = Math.abs(netBalance) < 0.005 && entries.length > 0;
   const fmt = (n: number) => n.toLocaleString('fi-FI', { minimumFractionDigits: 2 });
 
   return (
     <div className="jef jef-netvisor">
-      {/* Netvisor header bar */}
-      <div className="jef-nv-header">
-        <span className="jef-nv-label">Tositelaji</span>
-        <span className="jef-nv-value">MU Muut</span>
-        <span className="jef-nv-label">Selite</span>
-        <span className="jef-nv-value jef-nv-grow">—</span>
+
+      {/* ── Netvisor-style form header ───────────────────────────────────── */}
+      <div className="jef-nv-form-header">
+        <div className="jef-nv-field">
+          <span className="jef-nv-field-label">Tositelaji</span>
+          <span className="jef-nv-field-value">MU Muut</span>
+        </div>
+        <div className="jef-nv-field jef-nv-field-selite">
+          <span className="jef-nv-field-label">Selite</span>
+          <span className="jef-nv-field-value jef-nv-field-placeholder">—</span>
+        </div>
+        <div className="jef-nv-autopost">
+          <span className="jef-nv-autopost-label">Automaattinen vastakirjaus</span>
+          <span className="jef-nv-toggle jef-nv-toggle-off">Off</span>
+        </div>
       </div>
 
+      {/* ── Entry table ──────────────────────────────────────────────────── */}
       <table className="jef-table">
         <thead>
-          <tr>
+          <tr className="jef-nv-thead">
+            <th className="jef-th jef-nv-th-handle" aria-hidden="true" />
             <th className="jef-th jef-col-account">Tili</th>
             <th className="jef-th jef-col-amount">
               Summa
               <span className="jef-th-hint"> (+ debet / − kredit)</span>
             </th>
             <th className="jef-th jef-col-alv">ALV-%</th>
-            <th className="jef-th jef-col-alv">ALV-laji</th>
+            <th className="jef-th jef-col-alv">ALV-tunnus</th>
             {!disabled && <th className="jef-th jef-col-action" />}
           </tr>
         </thead>
         <tbody>
           {entries.map((e, i) => (
             <tr key={e.id} className="jef-row">
+              <td className="jef-td jef-nv-handle-cell" aria-hidden="true">≡</td>
               <td className="jef-td">
                 <select
                   value={e.account}
@@ -149,16 +169,17 @@ function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, on
                 <input
                   type="text"
                   inputMode="decimal"
-                  value={displayAmount(e)}
+                  value={rawAmounts[e.id] !== undefined ? rawAmounts[e.id] : committedDisplay(e)}
                   onChange={(ev) => handleAmountChange(e.id, ev.target.value)}
+                  onBlur={() => commitRaw(e.id)}
                   disabled={disabled}
                   aria-label={`Rivi ${i + 1}: summa`}
                   className={`jef-input jef-amount ${e.side === 'kredit' && e.amount > 0 ? 'jef-amount-kredit' : ''}`}
                   placeholder="0,00"
                 />
               </td>
+              <td className="jef-td jef-alv-locked">0 %</td>
               <td className="jef-td jef-alv-locked">—</td>
-              <td className="jef-td jef-alv-locked">Ei alv-käs.</td>
               {!disabled && (
                 <td className="jef-td jef-action-cell">
                   <button onClick={() => onRemove(e.id)} className="jef-remove" aria-label="Poista rivi">×</button>
@@ -169,17 +190,23 @@ function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, on
         </tbody>
         <tfoot>
           <tr className="jef-nv-total-row">
-            <td className="jef-td jef-nv-total-label">Erotus</td>
-            <td className={`jef-td jef-nv-total-amount ${Math.abs(netBalance) < 0.005 && entries.length > 0 ? 'balance-ok' : entries.length > 0 ? 'balance-err' : ''}`}>
+            <td className="jef-nv-total-label" colSpan={2}>Erotus</td>
+            <td className={`jef-nv-total-amount ${balanced ? 'balance-ok' : entries.length > 0 ? 'balance-err' : ''}`}>
               {fmt(netBalance)} €
             </td>
-            <td colSpan={disabled ? 2 : 3} />
+            <td className="jef-nv-dk-cell" colSpan={disabled ? 2 : 3}>
+              Debet / Kredit:&nbsp;
+              <span className="jef-nv-dk-val">{fmt(totalDebet)} / {fmt(totalKredit)}</span>
+            </td>
           </tr>
         </tfoot>
       </table>
 
+      {/* ── Bottom action row ─────────────────────────────────────────────── */}
       {!disabled && (
-        <button onClick={onAdd} className="jef-add-btn">+ Lisää rivi</button>
+        <div className="jef-nv-bottom">
+          <button onClick={onAdd} className="jef-add-btn">+ Lisää rivi</button>
+        </div>
       )}
     </div>
   );
@@ -188,6 +215,14 @@ function NetvisorForm({ entries, availableAccounts, disabled, onUpdateFields, on
 // ─── Procountor style ──────────────────────────────────────────────────────────
 
 function ProcountorForm({ entries, availableAccounts, balance, disabled, onUpdate, onUpdateFields, onAdd, onRemove }: FormProps) {
+  const [rawDebets, setRawDebets]   = useState<Record<string, string>>({});
+  const [rawKredits, setRawKredits] = useState<Record<string, string>>({});
+
+  function clearRaw(id: string, col: 'debet' | 'kredit') {
+    if (col === 'debet')  setRawDebets((p)  => { const n = { ...p }; delete n[id]; return n; });
+    else                  setRawKredits((p) => { const n = { ...p }; delete n[id]; return n; });
+  }
+
   return (
     <div className="jef jef-procountor">
       <table className="jef-table">
@@ -223,15 +258,15 @@ function ProcountorForm({ entries, availableAccounts, balance, disabled, onUpdat
                 <input
                   type="text"
                   inputMode="decimal"
-                  value={e.side === 'debet' && e.amount !== 0 ? e.amount : ''}
+                  value={rawDebets[e.id] !== undefined ? rawDebets[e.id] : (e.side === 'debet' && e.amount !== 0 ? String(e.amount) : '')}
                   onChange={(ev) => {
-                    const v = parseFloat(ev.target.value.replace(',', '.'));
-                    if (!isNaN(v) && v > 0) {
-                      onUpdateFields(e.id, { side: 'debet', amount: v });
-                    } else if (ev.target.value === '') {
-                      onUpdate(e.id, 'amount', 0);
-                    }
+                    const raw = ev.target.value;
+                    setRawDebets((p) => ({ ...p, [e.id]: raw }));
+                    const v = parseFloat(raw.replace(',', '.'));
+                    if (!isNaN(v) && v > 0) onUpdateFields(e.id, { side: 'debet', amount: v });
+                    else if (raw === '') onUpdate(e.id, 'amount', 0);
                   }}
+                  onBlur={() => clearRaw(e.id, 'debet')}
                   disabled={disabled}
                   aria-label={`Rivi ${i + 1}: debet`}
                   className="jef-input jef-amount"
@@ -242,15 +277,15 @@ function ProcountorForm({ entries, availableAccounts, balance, disabled, onUpdat
                 <input
                   type="text"
                   inputMode="decimal"
-                  value={e.side === 'kredit' && e.amount !== 0 ? e.amount : ''}
+                  value={rawKredits[e.id] !== undefined ? rawKredits[e.id] : (e.side === 'kredit' && e.amount !== 0 ? String(e.amount) : '')}
                   onChange={(ev) => {
-                    const v = parseFloat(ev.target.value.replace(',', '.'));
-                    if (!isNaN(v) && v > 0) {
-                      onUpdateFields(e.id, { side: 'kredit', amount: v });
-                    } else if (ev.target.value === '') {
-                      onUpdate(e.id, 'amount', 0);
-                    }
+                    const raw = ev.target.value;
+                    setRawKredits((p) => ({ ...p, [e.id]: raw }));
+                    const v = parseFloat(raw.replace(',', '.'));
+                    if (!isNaN(v) && v > 0) onUpdateFields(e.id, { side: 'kredit', amount: v });
+                    else if (raw === '') onUpdate(e.id, 'amount', 0);
                   }}
+                  onBlur={() => clearRaw(e.id, 'kredit')}
                   disabled={disabled}
                   aria-label={`Rivi ${i + 1}: kredit`}
                   className="jef-input jef-amount"

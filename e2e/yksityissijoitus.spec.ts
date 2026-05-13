@@ -6,7 +6,7 @@ test.describe('Yksityissijoitus — täysi tositepolku', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // Navigate to Tositekirjaus tab
-    await page.getByRole('button', { name: /Tositekirjaus/i }).click();
+    await page.getByRole('button', { name: 'Tositekirjaus — Marraskuu' }).click();
     // MonthIntro must appear
     await expect(page.getByRole('heading', { name: /Marraskuu 2026/ })).toBeVisible();
     // Start exercises
@@ -98,7 +98,7 @@ test.describe('Yksityissijoitus — täysi tositepolku', () => {
     await page.getByRole('button', { name: 'Tarkista' }).click();
     await page.getByRole('button', { name: /Lue selitys/i }).click();
 
-    await expect(page.getByText('Valmis')).toBeVisible();
+    await expect(page.getByText('Valmis', { exact: true })).toBeVisible();
     // Progress tracker should mark first item as valmis after completing
     await page.getByRole('button', { name: /Seuraava tosite/i }).click();
     await expect(page.locator('.pt-item-valmis').first()).toBeVisible();
@@ -108,7 +108,7 @@ test.describe('Yksityissijoitus — täysi tositepolku', () => {
 test.describe('Teeman vaihto muistiotositteessa', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: /Tositekirjaus/i }).click();
+    await page.getByRole('button', { name: 'Tositekirjaus — Marraskuu' }).click();
     await page.getByRole('button', { name: /Aloita marraskuun kirjaukset/i }).click();
     await page.getByRole('button', { name: /Siirry kirjaukseen/i }).click();
     await addCorrectLedgerEntries(page);
@@ -121,7 +121,7 @@ test.describe('Teeman vaihto muistiotositteessa', () => {
     await expect(page.locator('.jef-netvisor')).toBeVisible();
     // One amount column with hint, no D/K dropdown
     await expect(page.getByText('+ debet / − kredit', { exact: false })).toBeVisible();
-    await expect(page.locator('.jef-nv-header')).toBeVisible();
+    await expect(page.locator('.jef-nv-form-header')).toBeVisible();
   });
 
   test('Procountor-teema näyttää erilliset Debet/Kredit-sarakkeet', async ({ page }) => {
@@ -137,7 +137,7 @@ test.describe('Teeman vaihto muistiotositteessa', () => {
 test.describe('Saavutettavuus', () => {
   test('tiliristikko toimii näppäimistöllä', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: /Tositekirjaus/i }).click();
+    await page.getByRole('button', { name: 'Tositekirjaus — Marraskuu' }).click();
     await page.getByRole('button', { name: /Aloita marraskuun kirjaukset/i }).click();
     await page.getByRole('button', { name: /Siirry kirjaukseen/i }).click();
 
@@ -155,7 +155,7 @@ test.describe('Saavutettavuus', () => {
 
   test('MicroContent-popup sulkeutuu Esc-näppäimellä', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: /Tositekirjaus/i }).click();
+    await page.getByRole('button', { name: 'Tositekirjaus — Marraskuu' }).click();
     await page.getByRole('button', { name: /Aloita marraskuun kirjaukset/i }).click();
     await page.getByRole('button', { name: /Siirry kirjaukseen/i }).click();
 
@@ -191,7 +191,7 @@ test.describe('Saavutettavuus', () => {
 
   test('edistymistrakker on näppäimistöllä navigoitava', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: /Tositekirjaus/i }).click();
+    await page.getByRole('button', { name: 'Tositekirjaus — Marraskuu' }).click();
     await page.getByRole('button', { name: /Aloita marraskuun kirjaukset/i }).click();
 
     // ProgressTracker nav has role=navigation

@@ -1,7 +1,8 @@
 # Iteraatio 2: Tositekirjausnäkymä — marraskuun ensimmäiset tositteet
 
-**Aloituspäivä:** _(täyttäkää kun Iteraatio 1 on valmis)_
-**Status:** Aloittamatta — odottaa Iteraatio 1:n valmistumista
+**Aloituspäivä:** 2026-05-07
+**Status:** ✅ Valmis — 2026-05-13
+**Huomiot:** Kaikki 8 tositetta toimivat. Netvisor-lomake vastaa referenssikuvaa (tummansininen otsikkorivi, yksi summasarake, etumerkki = puoli). Desimaalipilkku ja miinus toimivat molemmissa lomakkeissa. Marraskuun koonti 4000 vs 8400 -opetuspaneelilla lisätty.
 **Vastuuhenkilö:** Marko + Claude Code
 **Edellytykset:** Iteraatio 1 valmis (infrastruktuuri + theme provider + sanastoharjoitus toimii)
 

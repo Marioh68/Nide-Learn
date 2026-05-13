@@ -137,14 +137,22 @@ export const novemberPhase1Exercises: DocumentExercise[] = [
       paymentTerm: 'Korttimaksu',
     },
     correctEntries: [
-      { account: '4000', side: 'debet',  amount: 35 },
+      { account: '8400', side: 'debet',  amount: 35 },
       { account: '1910', side: 'kredit', amount: 35 },
     ],
-    errorMessages: defaultErrorMessages,
+    errorMessages: {
+      ...defaultErrorMessages,
+      account: {
+        attempt1: 'Tarkista kumpi tili on oikein. Myydäänkö nämä tarvikkeet eteenpäin asiakkaalle?',
+        attempt2: 'Tili 4000 Aineet ja tarvikkeet sopii tuotannollisille materiaaleille, joita käytetään myytävissä tuotteissa. Kynät ja muistilapat ovat yleisiä toimistokuluja.',
+        attempt3: 'Liiketoiminnan muut kulut (8400) on oikea tili toimistotarvikkeille — ne eivät päädy asiakkaan tuotteeseen. Korttimaksusta ei synny ostovelkaa, joten kredit menee pankkitilille (1910). Avaa selitys.',
+        microContentId: 'mikrosisalto-3',
+      },
+    },
     orientationQuestion:
-      'Pohdi: Kuitti on jo maksettu heti. Syntyykö ostovelkaa vai lähtikö raha suoraan pankkitililtä?',
+      'Pohdi: Nämä tarvikkeet ovat Katin omaan toimistotyöhön — ei myydä asiakkaalle. Syntyykö ostovelkaa kortilla maksaessa?',
     explanation:
-      'Kuitilla ostettu tavara on maksettu välittömästi. Aineet ja tarvikkeet (4000) debetoidaan — kulu syntyy. Pankkitili (1910) kreditoidaan — raha on jo lähtenyt tililtä.',
+      'Toimistotarvikkeet ovat liiketoiminnan yleiskuluja — niitä ei käytetä asiakkaalle myytävässä tuotteessa, joten tili on Liiketoiminnan muut kulut (8400), ei Aineet ja tarvikkeet (4000). Kortilla maksettu kuitti tarkoittaa, että raha lähtee heti pankkitililtä (1910 kredit) — ostovelkaa ei synny.',
   },
 
   // ── 5. Ostolasku — suoramaksu (PixelPro) ────────────────────────────────
