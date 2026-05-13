@@ -1318,3 +1318,262 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-text);
 }
 .doc-card-tiliotetapahtuma .doc-card-header { background: #2c7873; }
+
+/* ─── February intro — ALV rates box ────────────────────────────────────── */
+
+.feb-intro-alv-rates {
+  width: 100%;
+  background: #f5f3ff;
+  border: 1px solid #7c3aed;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+.feb-intro-rates-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6d28d9;
+  margin-bottom: 0.25rem;
+}
+.feb-intro-rate-row {
+  display: grid;
+  grid-template-columns: 3.25rem 5.5rem 1fr;
+  align-items: center;
+  gap: 0.5rem;
+}
+.feb-rate-pct {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.feb-rate-25 { background: #e3f2fd; color: #1565c0; }
+.feb-rate-13 { background: #e8f5ed; color: #2e7d52; }
+.feb-rate-10 { background: #fff7e6; color: #d68910; }
+.feb-rate-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.feb-rate-ex {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+/* February hero variant */
+.ns-hero-feb .ns-hero-icon {
+  background: #f5f3ff;
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+
+/* ─── ReportView ─────────────────────────────────────────────────────────── */
+
+.report-view {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+}
+
+.report-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.report-title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 0.2rem;
+}
+
+.report-subtitle {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.report-period-sel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.report-select {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.report-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.report-section-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  padding-bottom: 0.375rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.report-section-desc {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.report-table-wrap { overflow-x: auto; }
+.report-table-wrap-narrow { max-width: 520px; }
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.report-th {
+  text-align: left;
+  padding: 0.375rem 0.6rem;
+  background: var(--color-surface-raised);
+  border-bottom: 2px solid var(--color-border);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.report-th-num { text-align: right; }
+.report-th-cat { width: 18px; padding: 0 0 0 8px; }
+
+.report-tr:nth-child(even) { background: var(--color-surface-raised); }
+
+/* Category accent on account name column in trial balance */
+.report-tr-vastaavaa   .report-td-account { color: #1e40af; }
+.report-tr-vastattavaa .report-td-account { color: #5b21b6; }
+.report-tr-tuotot      .report-td-account { color: #166534; }
+.report-tr-kulut       .report-td-account { color: #991b1b; }
+
+.report-td {
+  padding: 0.35rem 0.6rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-variant-numeric: tabular-nums;
+}
+.report-td-num { text-align: right; font-variant-numeric: tabular-nums; }
+.report-td-saldo { font-weight: 600; }
+.report-td-account { color: var(--color-text); }
+.report-td-cat { width: 18px; padding: 0 4px 0 8px; vertical-align: middle; }
+
+/* Coloured category dot */
+.report-cat-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.report-cat-vastaavaa   { background: #3b82f6; }
+.report-cat-vastattavaa { background: #8b5cf6; }
+.report-cat-tuotot      { background: #22c55e; }
+.report-cat-kulut       { background: #ef4444; }
+
+/* Group header row (LIIKEVAIHTO / KULUT) */
+.report-group-row td {
+  padding-top: 0.8rem;
+  background: transparent !important;
+}
+.report-td-group {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+}
+
+/* Total row */
+.report-total-row td {
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-raised) !important;
+}
+.report-td-total { font-weight: 700; color: var(--color-text); }
+
+/* Net result row */
+.report-result-row td {
+  border-top: 2px solid var(--color-border);
+  background: var(--color-secondary) !important;
+}
+.report-td-result { font-weight: 700; color: var(--color-primary); }
+
+/* Tilikauden tulos row in tase */
+.report-tulos-row .report-td-tulos { font-style: italic; color: var(--color-text-muted); }
+
+/* Tase two-column layout */
+.report-tase-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+@media (max-width: 640px) { .report-tase-grid { grid-template-columns: 1fr; } }
+
+.report-tase-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.report-tase-col-header {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+  padding: 0.25rem 0;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.report-balance-ok {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.75rem;
+  text-align: center;
+}
+
+.report-balance-err {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.75rem;
+  text-align: center;
+}
+
+.report-pos { color: var(--color-success); font-weight: 700; }
+.report-neg { color: var(--color-error); font-weight: 700; }

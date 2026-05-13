@@ -5,15 +5,17 @@ import { VocabularyExercise } from '@/components/VocabularyExercise';
 import { ExerciseFlow } from '@/components/ExerciseFlow';
 import { ProgressTracker } from '@/components/ProgressTracker';
 import { MonthIntro } from '@/components/MonthIntro';
+import { ReportView } from '@/components/ReportView';
 import { level1Vocabulary } from '@/data/vocabulary/level-1';
 import { novemberPhase1Exercises } from '@/data/exercises/november-phase1';
 import { novemberPhase2Exercises } from '@/data/exercises/november-phase2';
 import { decemberExercises } from '@/data/exercises/december';
 import { januaryExercises } from '@/data/exercises/january';
+import { februaryExercises } from '@/data/exercises/february';
 import { useTheme } from '@/hooks/useTheme';
 import type { DocumentStatus } from '@/types/exercises';
 
-type Tab = 'sanasto' | 'marraskuu' | 'joulukuu' | 'tammikuu';
+type Tab = 'sanasto' | 'marraskuu' | 'joulukuu' | 'tammikuu' | 'helmikuu' | 'raportit';
 
 const allNovemberExercises = [...novemberPhase1Exercises, ...novemberPhase2Exercises];
 
@@ -45,81 +47,67 @@ export function DemoTabs() {
     januaryExercises.map(() => 'aloittamatta'),
   );
 
+  // ── February state ──────────────────────────────────────────────────────────
+  const [febIntroSeen, setFebIntroSeen] = useState(false);
+  const [febIndex, setFebIndex] = useState(0);
+  const [febDone, setFebDone] = useState(false);
+  const [febStatuses, setFebStatuses] = useState<DocumentStatus[]>(
+    februaryExercises.map(() => 'aloittamatta'),
+  );
+
   // ── November handlers ───────────────────────────────────────────────────────
   function handleNovComplete() {
     const isLast = novIndex === allNovemberExercises.length - 1;
-    setNovStatuses((prev) => {
-      const n = [...prev];
-      n[novIndex] = 'valmis';
-      return n;
-    });
-    if (isLast) {
-      setNovDone(true);
-    } else {
-      setNovIndex((i) => i + 1);
-    }
+    setNovStatuses((prev) => { const n = [...prev]; n[novIndex] = 'valmis'; return n; });
+    if (isLast) setNovDone(true);
+    else setNovIndex((i) => i + 1);
   }
-
   function handleNovSelect(index: number) {
     setNovIndex(index);
     if (novStatuses[index] === 'aloittamatta') {
-      setNovStatuses((prev) => {
-        const n = [...prev];
-        n[index] = 'kesken';
-        return n;
-      });
-    }
-  }
-
-  // ── January handlers ────────────────────────────────────────────────────────
-  function handleJanComplete() {
-    const isLast = janIndex === januaryExercises.length - 1;
-    setJanStatuses((prev) => {
-      const n = [...prev];
-      n[janIndex] = 'valmis';
-      return n;
-    });
-    if (isLast) {
-      setJanDone(true);
-    } else {
-      setJanIndex((i) => i + 1);
-    }
-  }
-
-  function handleJanSelect(index: number) {
-    setJanIndex(index);
-    if (janStatuses[index] === 'aloittamatta') {
-      setJanStatuses((prev) => {
-        const n = [...prev];
-        n[index] = 'kesken';
-        return n;
-      });
+      setNovStatuses((prev) => { const n = [...prev]; n[index] = 'kesken'; return n; });
     }
   }
 
   // ── December handlers ───────────────────────────────────────────────────────
   function handleDecComplete() {
     const isLast = decIndex === decemberExercises.length - 1;
-    setDecStatuses((prev) => {
-      const n = [...prev];
-      n[decIndex] = 'valmis';
-      return n;
-    });
-    if (isLast) {
-      setDecDone(true);
-    } else {
-      setDecIndex((i) => i + 1);
-    }
+    setDecStatuses((prev) => { const n = [...prev]; n[decIndex] = 'valmis'; return n; });
+    if (isLast) setDecDone(true);
+    else setDecIndex((i) => i + 1);
   }
-
   function handleDecSelect(index: number) {
     setDecIndex(index);
     if (decStatuses[index] === 'aloittamatta') {
-      setDecStatuses((prev) => {
-        const n = [...prev];
-        n[index] = 'kesken';
-        return n;
-      });
+      setDecStatuses((prev) => { const n = [...prev]; n[index] = 'kesken'; return n; });
+    }
+  }
+
+  // ── January handlers ────────────────────────────────────────────────────────
+  function handleJanComplete() {
+    const isLast = janIndex === januaryExercises.length - 1;
+    setJanStatuses((prev) => { const n = [...prev]; n[janIndex] = 'valmis'; return n; });
+    if (isLast) setJanDone(true);
+    else setJanIndex((i) => i + 1);
+  }
+  function handleJanSelect(index: number) {
+    setJanIndex(index);
+    if (janStatuses[index] === 'aloittamatta') {
+      setJanStatuses((prev) => { const n = [...prev]; n[index] = 'kesken'; return n; });
+    }
+  }
+
+  // ── February handlers ───────────────────────────────────────────────────────
+  function handleFebComplete() {
+    const isLast = febIndex === februaryExercises.length - 1;
+    setFebStatuses((prev) => { const n = [...prev]; n[febIndex] = 'valmis'; return n; });
+    if (isLast) setFebDone(true);
+    else setFebIndex((i) => i + 1);
+  }
+  function handleFebSelect(index: number) {
+    setFebIndex(index);
+    if (febStatuses[index] === 'aloittamatta') {
+      setFebStatuses((prev) => { const n = [...prev]; n[index] = 'kesken'; return n; });
     }
   }
 
@@ -150,6 +138,18 @@ export function DemoTabs() {
           onClick={() => setTab('tammikuu')}
         >
           Tositekirjaus — Tammikuu (ALV)
+        </button>
+        <button
+          className={`demo-tab ${tab === 'helmikuu' ? 'demo-tab-active' : ''}`}
+          onClick={() => setTab('helmikuu')}
+        >
+          Tositekirjaus — Helmikuu (Taso 2)
+        </button>
+        <button
+          className={`demo-tab ${tab === 'raportit' ? 'demo-tab-active' : ''}`}
+          onClick={() => setTab('raportit')}
+        >
+          Raportit
         </button>
       </div>
 
@@ -288,7 +288,58 @@ export function DemoTabs() {
               setJanIndex(0);
               setJanStatuses(januaryExercises.map(() => 'aloittamatta'));
             }}
+            onNext={() => setTab('helmikuu')}
           />
+        </div>
+      )}
+
+      {/* ── HELMIKUU — intro ─────────────────────────────────────────────────── */}
+      {tab === 'helmikuu' && !febIntroSeen && (
+        <div className="demo-pane">
+          <FebIntro onStart={() => setFebIntroSeen(true)} />
+        </div>
+      )}
+
+      {/* ── HELMIKUU — harjoitukset ──────────────────────────────────────────── */}
+      {tab === 'helmikuu' && febIntroSeen && !febDone && (
+        <div className="demo-pane demo-pane-split">
+          <aside className="demo-sidebar">
+            <ProgressTracker
+              exercises={februaryExercises}
+              statuses={febStatuses}
+              currentIndex={febIndex}
+              onSelect={handleFebSelect}
+            />
+          </aside>
+          <div className="demo-exercise-area">
+            <ExerciseFlow
+              key={febIndex}
+              exercise={februaryExercises[febIndex]}
+              theme={theme}
+              onComplete={handleFebComplete}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── HELMIKUU — koonti ───────────────────────────────────────────────── */}
+      {tab === 'helmikuu' && febIntroSeen && febDone && (
+        <div className="demo-pane">
+          <FebSummary
+            onRestart={() => {
+              setFebDone(false);
+              setFebIndex(0);
+              setFebStatuses(februaryExercises.map(() => 'aloittamatta'));
+            }}
+            onNext={() => setTab('raportit')}
+          />
+        </div>
+      )}
+
+      {/* ── RAPORTIT ─────────────────────────────────────────────────────────── */}
+      {tab === 'raportit' && (
+        <div className="demo-pane">
+          <ReportView />
         </div>
       )}
     </>
@@ -598,7 +649,7 @@ function JanuaryIntro({ onStart }: { onStart: () => void }) {
 
 // ─── January summary screen ────────────────────────────────────────────────────
 
-function JanuarySummary({ onRestart }: { onRestart: () => void }) {
+function JanuarySummary({ onRestart, onNext }: { onRestart: () => void; onNext?: () => void }) {
   return (
     <div className="ns-root">
       <div className="ns-hero ns-hero-jan">
@@ -659,6 +710,118 @@ function JanuarySummary({ onRestart }: { onRestart: () => void }) {
         <button className="ns-restart-btn" onClick={onRestart}>
           Aloita tammikuu uudelleen
         </button>
+        {onNext && (
+          <button className="ns-next-btn" onClick={onNext}>
+            Siirry helmikuuhun (Taso 2) →
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── February intro screen ─────────────────────────────────────────────────────
+
+function FebIntro({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="month-intro">
+      <div className="month-intro-icon">💻</div>
+      <h2 className="month-intro-title">Helmikuu 2027 — Taso 2</h2>
+      <div className="month-intro-story">
+        <p>
+          Tammikuun ALV-sykli on hallussa. Helmikuussa Kati kohtaa kaksi uutta asiaa:{' '}
+          <strong>ALV-kannat vaihtelevat</strong> ja hän hankkii uuden kannettavan —
+          ensimmäisen <strong>käyttöomaisuuserän</strong>.
+        </p>
+        <p>
+          Suomessa on kolme ALV-kantaa: 25,5 % (yleinen), 13,5 % (kirjat, elintarvikkeet,
+          ravintolat) ja 10 % (sanoma- ja aikakauslehdet).{' '}
+          <strong>Kirjausrakenne on sama</strong> kannasta riippumatta — vain prosentti
+          muuttuu laskukaavassa.
+        </p>
+        <p>
+          Laptop (1 200 € netto, 5 vuotta käyttöä) ei ole kulukirjaus — se aktivoidaan
+          tase-tilille <strong>1200 Koneet ja kalusto</strong> ja poistetaan kuukausittain
+          tilille <strong>7680 Poistot koneista ja kalustosta</strong>.
+        </p>
+      </div>
+      <div className="month-intro-meta">
+        <span>📅 Helmikuu 2027</span>
+        <span>🏢 Asiakas Tmi — Kati Mäkinen</span>
+        <span>🏦 Nide Bank</span>
+      </div>
+      <div className="feb-intro-alv-rates">
+        <div className="feb-intro-rates-title">ALV-kannat 2027</div>
+        <div className="feb-intro-rate-row">
+          <span className="feb-rate-pct feb-rate-25">25,5 %</span>
+          <span className="feb-rate-name">Yleinen kanta</span>
+          <span className="feb-rate-ex">Palvelut, tekniikka, polttoaine, ajoneuvot</span>
+        </div>
+        <div className="feb-intro-rate-row">
+          <span className="feb-rate-pct feb-rate-13">13,5 %</span>
+          <span className="feb-rate-name">Alennettu I</span>
+          <span className="feb-rate-ex">Kirjat, ruoka ja juomat, ravintolat, majoitus</span>
+        </div>
+        <div className="feb-intro-rate-row">
+          <span className="feb-rate-pct feb-rate-10">10,0 %</span>
+          <span className="feb-rate-name">Alennettu II</span>
+          <span className="feb-rate-ex">Sanomalehdet, aikakauslehdet</span>
+        </div>
+      </div>
+      <button className="month-intro-btn" onClick={onStart}>
+        Aloita helmikuun kirjaukset →
+      </button>
+    </div>
+  );
+}
+
+// ─── February summary screen ───────────────────────────────────────────────────
+
+function FebSummary({ onRestart, onNext }: { onRestart: () => void; onNext?: () => void }) {
+  return (
+    <div className="ns-root">
+      <div className="ns-hero ns-hero-feb">
+        <div className="ns-hero-icon">💻</div>
+        <h2 className="ns-hero-title">Helmikuun kirjaukset valmis!</h2>
+        <p className="ns-hero-sub">ALV-kannat + käyttöomaisuus + poistot hallussa</p>
+      </div>
+
+      <div className="ns-section">
+        <h3 className="ns-section-title">Mitä opit helmikuussa?</h3>
+        <div className="ns-compare">
+          <div className="ns-compare-card ns-compare-4000">
+            <div className="ns-compare-account">ALV-kannat: sama kaava, eri %</div>
+            <p className="ns-compare-rule">
+              <strong>25,5 % / 13,5 % / 10 %</strong> — kirjausrakenne identtinen.
+              Vain ALV-osuuden laskenta muuttuu.
+            </p>
+            <p className="ns-compare-example">
+              13,5 % kirja: 8400 D 40 / 2920 D 5,40 / 1910 K 45,40
+            </p>
+          </div>
+          <div className="ns-compare-card ns-compare-8400">
+            <div className="ns-compare-account">1200 Käyttöomaisuus + 7680 Poistot</div>
+            <p className="ns-compare-rule">
+              <strong>Aktivointi</strong> — iso hankinta (≥ 3 v, ≥ 850 € netto)
+              menee taseeseen, ei suoraan kuluksi.
+            </p>
+            <p className="ns-compare-example">
+              Laptop: 1200 D 1 200 / 2920 D 306 / 2520 K 1 506
+              | Poisto: 7680 D 20 / 1200 K 20
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="ns-actions">
+        <button className="ns-restart-btn" onClick={onRestart}>
+          Aloita helmikuu uudelleen
+        </button>
+        {onNext && (
+          <button className="ns-next-btn" onClick={onNext}>
+            Katso raportit →
+          </button>
+        )}
       </div>
     </div>
   );
