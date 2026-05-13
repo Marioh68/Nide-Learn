@@ -1074,6 +1074,58 @@ h1, h2, h3, h4, h5, h6 {
 .dec-intro-pos { color: #1c5fa6; }
 .dec-intro-neg { color: var(--color-error); }
 
+/* January intro — ALV-tilit box */
+.jan-intro-alv-box {
+  width: 100%;
+  background: #e8f5ed;
+  border: 1px solid var(--color-success);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+.jan-intro-alv-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-success);
+  margin-bottom: 0.25rem;
+}
+.jan-intro-alv-row {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.jan-intro-alv-num {
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+.jan-intro-alv-name {
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+.jan-intro-alv-side {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+.jan-alv-k { background: #fdecea; color: var(--color-error); }
+.jan-alv-d { background: #e3f2fd; color: #1565c0; }
+
+/* January summary hero variant */
+.ns-hero-jan .ns-hero-icon {
+  background: #e8f5ed;
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
 /* ─── MicroContent ───────────────────────────────────────────────────────── */
 
 .mc-backdrop {
@@ -1229,4 +1281,40 @@ h1, h2, h3, h4, h5, h6 {
 .doc-card-myyntilasku      .doc-card-header { background: #1c5fa6; }
 .doc-card-ostolasku        .doc-card-header { background: #7d3f8c; }
 .doc-card-kuitti           .doc-card-header { background: #d68910; }
+.doc-card-muistiotosite    .doc-card-header { background: #37474f; }
+
+/* ALV breakdown in doc-card-footer */
+.doc-alv-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+}
+.doc-alv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+.doc-alv-label { font-variant-numeric: tabular-nums; }
+.doc-alv-val   { font-variant-numeric: tabular-nums; }
+.doc-alv-total-row {
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 0.25rem;
+  margin-top: 0.1rem;
+}
+.doc-alv-total-row .doc-amount-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+.doc-alv-total-row .doc-amount {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
 .doc-card-tiliotetapahtuma .doc-card-header { background: #2c7873; }

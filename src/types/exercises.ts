@@ -7,7 +7,8 @@ export type DocumentType =
   | 'myyntilasku'
   | 'ostolasku'
   | 'kuitti'
-  | 'tiliotetapahtuma';
+  | 'tiliotetapahtuma'
+  | 'muistiotosite';
 
 export type DocumentStatus = 'aloittamatta' | 'kesken' | 'valmis' | 'ohitettu';
 
@@ -65,6 +66,7 @@ export interface DocumentTemplate {
   dueDayOffset?: number; // +1 = seuraava kuukausi
   paymentTerm?: string;
   referenceNumber?: string;
+  vatRate?: number;      // e.g. 25.5 — if set, amount is total incl. VAT
 }
 
 // ─── Full exercise unit ───────────────────────────────────────────────────────

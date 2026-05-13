@@ -9,10 +9,11 @@ import { level1Vocabulary } from '@/data/vocabulary/level-1';
 import { novemberPhase1Exercises } from '@/data/exercises/november-phase1';
 import { novemberPhase2Exercises } from '@/data/exercises/november-phase2';
 import { decemberExercises } from '@/data/exercises/december';
+import { januaryExercises } from '@/data/exercises/january';
 import { useTheme } from '@/hooks/useTheme';
 import type { DocumentStatus } from '@/types/exercises';
 
-type Tab = 'sanasto' | 'marraskuu' | 'joulukuu';
+type Tab = 'sanasto' | 'marraskuu' | 'joulukuu' | 'tammikuu';
 
 const allNovemberExercises = [...novemberPhase1Exercises, ...novemberPhase2Exercises];
 
@@ -36,6 +37,14 @@ export function DemoTabs() {
     decemberExercises.map(() => 'aloittamatta'),
   );
 
+  // ── January state ───────────────────────────────────────────────────────────
+  const [janIntroSeen, setJanIntroSeen] = useState(false);
+  const [janIndex, setJanIndex] = useState(0);
+  const [janDone, setJanDone] = useState(false);
+  const [janStatuses, setJanStatuses] = useState<DocumentStatus[]>(
+    januaryExercises.map(() => 'aloittamatta'),
+  );
+
   // ── November handlers ───────────────────────────────────────────────────────
   function handleNovComplete() {
     const isLast = novIndex === allNovemberExercises.length - 1;
@@ -55,6 +64,32 @@ export function DemoTabs() {
     setNovIndex(index);
     if (novStatuses[index] === 'aloittamatta') {
       setNovStatuses((prev) => {
+        const n = [...prev];
+        n[index] = 'kesken';
+        return n;
+      });
+    }
+  }
+
+  // ── January handlers ────────────────────────────────────────────────────────
+  function handleJanComplete() {
+    const isLast = janIndex === januaryExercises.length - 1;
+    setJanStatuses((prev) => {
+      const n = [...prev];
+      n[janIndex] = 'valmis';
+      return n;
+    });
+    if (isLast) {
+      setJanDone(true);
+    } else {
+      setJanIndex((i) => i + 1);
+    }
+  }
+
+  function handleJanSelect(index: number) {
+    setJanIndex(index);
+    if (janStatuses[index] === 'aloittamatta') {
+      setJanStatuses((prev) => {
         const n = [...prev];
         n[index] = 'kesken';
         return n;
@@ -109,6 +144,12 @@ export function DemoTabs() {
           onClick={() => setTab('joulukuu')}
         >
           Tositekirjaus — Joulukuu
+        </button>
+        <button
+          className={`demo-tab ${tab === 'tammikuu' ? 'demo-tab-active' : ''}`}
+          onClick={() => setTab('tammikuu')}
+        >
+          Tositekirjaus — Tammikuu (ALV)
         </button>
       </div>
 
@@ -203,6 +244,49 @@ export function DemoTabs() {
               setDecDone(false);
               setDecIndex(0);
               setDecStatuses(decemberExercises.map(() => 'aloittamatta'));
+            }}
+            onNext={() => setTab('tammikuu')}
+          />
+        </div>
+      )}
+
+      {/* ── TAMMIKUU — intro ─────────────────────────────────────────────────── */}
+      {tab === 'tammikuu' && !janIntroSeen && (
+        <div className="demo-pane">
+          <JanuaryIntro onStart={() => setJanIntroSeen(true)} />
+        </div>
+      )}
+
+      {/* ── TAMMIKUU — harjoitukset ──────────────────────────────────────────── */}
+      {tab === 'tammikuu' && janIntroSeen && !janDone && (
+        <div className="demo-pane demo-pane-split">
+          <aside className="demo-sidebar">
+            <ProgressTracker
+              exercises={januaryExercises}
+              statuses={janStatuses}
+              currentIndex={janIndex}
+              onSelect={handleJanSelect}
+            />
+          </aside>
+          <div className="demo-exercise-area">
+            <ExerciseFlow
+              key={janIndex}
+              exercise={januaryExercises[janIndex]}
+              theme={theme}
+              onComplete={handleJanComplete}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── TAMMIKUU — koonti ───────────────────────────────────────────────── */}
+      {tab === 'tammikuu' && janIntroSeen && janDone && (
+        <div className="demo-pane">
+          <JanuarySummary
+            onRestart={() => {
+              setJanDone(false);
+              setJanIndex(0);
+              setJanStatuses(januaryExercises.map(() => 'aloittamatta'));
             }}
           />
         </div>
@@ -408,7 +492,7 @@ function DecemberIntro({ onStart }: { onStart: () => void }) {
 
 // ─── December summary screen ───────────────────────────────────────────────────
 
-function DecemberSummary({ onRestart }: { onRestart: () => void }) {
+function DecemberSummary({ onRestart, onNext }: { onRestart: () => void; onNext?: () => void }) {
   return (
     <div className="ns-root">
       <div className="ns-hero ns-hero-dec">
@@ -447,6 +531,133 @@ function DecemberSummary({ onRestart }: { onRestart: () => void }) {
       <div className="ns-actions">
         <button className="ns-restart-btn" onClick={onRestart}>
           Aloita joulukuu uudelleen
+        </button>
+        {onNext && (
+          <button className="ns-next-btn" onClick={onNext}>
+            Siirry tammikuuhun (ALV) →
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── January intro screen ──────────────────────────────────────────────────────
+
+function JanuaryIntro({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="month-intro">
+      <div className="month-intro-icon">🧾</div>
+      <h2 className="month-intro-title">Tammikuu 2027 — ALV alkaa</h2>
+      <div className="month-intro-story">
+        <p>
+          Katin yritys on kasvanut — marraskuun ja joulukuun yhteisliikevaihto ylitti{' '}
+          <strong>20 000 €:n rajan</strong>. AVL:n (arvonlisäverolain) mukaan Kati rekisteröityy
+          ALV-velvolliseksi tammikuun alusta.
+        </p>
+        <p>
+          Tammikuusta lähtien <strong>kaikki laskut sisältävät ALV:n</strong>. Myyntilaskuihin
+          lisätään 25,5 % ALV, joka tilitetään Verohallinnolle. Ostolaskujen ALV on
+          vähennyskelpoinen — Kati saa vähentää sen myyntiensä ALV:sta.
+        </p>
+        <p>
+          Jokainen ALV:llinen kirjaus tarvitsee <strong>kolme riviä</strong>: myynneissä
+          myyntisaamiset (brutto) + myynti (netto) + suoritettava ALV. Ostoissa kulutili
+          (netto) + vähennettävä ALV + ostovelka tai pankki (brutto).
+        </p>
+      </div>
+      <div className="month-intro-meta">
+        <span>📅 Tammikuu 2027</span>
+        <span>🏢 Asiakas Tmi — Kati Mäkinen</span>
+        <span>🏦 Nide Bank</span>
+      </div>
+      <div className="jan-intro-alv-box">
+        <div className="jan-intro-alv-title">ALV-tilit käyttöön</div>
+        <div className="jan-intro-alv-row">
+          <span className="jan-intro-alv-num">2871</span>
+          <span className="jan-intro-alv-name">Suoritettava ALV myynneistä</span>
+          <span className="jan-intro-alv-side jan-alv-k">Kredit myynnissä</span>
+        </div>
+        <div className="jan-intro-alv-row">
+          <span className="jan-intro-alv-num">2920</span>
+          <span className="jan-intro-alv-name">Vähennettävä ALV ostoista</span>
+          <span className="jan-intro-alv-side jan-alv-d">Debet ostoissa</span>
+        </div>
+        <div className="jan-intro-alv-row">
+          <span className="jan-intro-alv-num">2870</span>
+          <span className="jan-intro-alv-name">ALV-velka</span>
+          <span className="jan-intro-alv-side jan-alv-k">Tilityksen tulos</span>
+        </div>
+      </div>
+      <button className="month-intro-btn" onClick={onStart}>
+        Aloita tammikuun kirjaukset →
+      </button>
+    </div>
+  );
+}
+
+// ─── January summary screen ────────────────────────────────────────────────────
+
+function JanuarySummary({ onRestart }: { onRestart: () => void }) {
+  return (
+    <div className="ns-root">
+      <div className="ns-hero ns-hero-jan">
+        <div className="ns-hero-icon">🧾</div>
+        <h2 className="ns-hero-title">Tammikuun kirjaukset valmis!</h2>
+        <p className="ns-hero-sub">ALV-sykli kk 1: myynti → tilitys → maksu</p>
+      </div>
+
+      <div className="ns-section">
+        <h3 className="ns-section-title">ALV-kirjausten kaavat</h3>
+        <div className="ns-compare">
+          <div className="ns-compare-card ns-compare-4000">
+            <div className="ns-compare-account">Myyntilasku ALV:lla</div>
+            <p className="ns-compare-rule">
+              <strong>3 riviä:</strong> myyntisaamiset koko summa (D) /
+              veroton myynti (K) + suoritettava ALV 2871 (K)
+            </p>
+            <p className="ns-compare-example">
+              1700 D 1 506 / 3000 K 1 200 / 2871 K 306
+            </p>
+          </div>
+          <div className="ns-compare-card ns-compare-8400">
+            <div className="ns-compare-account">Ostolasku / kuitti ALV:lla</div>
+            <p className="ns-compare-rule">
+              <strong>3 riviä:</strong> kulutili veroton (D) + ALV-vähennys 2920 (D) /
+              ostovelka tai pankki koko summa (K)
+            </p>
+            <p className="ns-compare-example">
+              8400 D 40 / 2920 D 10,20 / 1910 K 50,20
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="ns-section">
+        <h3 className="ns-section-title">ALV-sykli kuukauden lopussa</h3>
+        <table className="ns-table">
+          <thead>
+            <tr>
+              <th className="ns-th">Toimenpide</th>
+              <th className="ns-th">Kirjaus</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="ns-tr">
+              <td className="ns-td ns-td-type">ALV-tilitys (kk lopussa)</td>
+              <td className="ns-td">2871 D / 2920 K / 2870 K (netto velka)</td>
+            </tr>
+            <tr className="ns-tr">
+              <td className="ns-td ns-td-type">ALV-maksu (12. seuraavaa kk)</td>
+              <td className="ns-td">2870 D / 1910 K</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div className="ns-actions">
+        <button className="ns-restart-btn" onClick={onRestart}>
+          Aloita tammikuu uudelleen
         </button>
       </div>
     </div>
