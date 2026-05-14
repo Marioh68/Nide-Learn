@@ -22,7 +22,6 @@ test.describe('Raportit-välilehti', () => {
   test('kuukauden valinta -pudotusvalikko on olemassa', async ({ page }) => {
     const sel = page.locator('#report-month-sel');
     await expect(sel).toBeVisible();
-    // Default label contains Helmikuu
     await expect(sel.locator('option:checked')).toContainText('Helmikuu');
   });
 });
@@ -32,7 +31,6 @@ test.describe('Raportit — kuukausivalinnan vaikutus', () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Raportit' }).click();
     await page.locator('#report-month-sel').selectOption('0');
-    // 2870 should not be visible — VAT starts in January (offset 2)
     await expect(page.getByText('2870')).not.toBeVisible();
   });
 
@@ -40,8 +38,7 @@ test.describe('Raportit — kuukausivalinnan vaikutus', () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Raportit' }).click();
     await page.locator('#report-month-sel').selectOption('2');
-    await expect(page.getByText(/2871/)).toBeVisible();
-    // Tase tasapainossa also in January
+    await expect(page.getByText(/2871/).first()).toBeVisible();
     await expect(page.getByText('✓ Tase tasapainossa')).toBeVisible();
   });
 
@@ -49,8 +46,8 @@ test.describe('Raportit — kuukausivalinnan vaikutus', () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Raportit' }).click();
     // Default is helmikuu (index 3)
-    await expect(page.getByText(/7680/)).toBeVisible();
-    await expect(page.getByText(/1200/)).toBeVisible();
+    await expect(page.getByText(/7680/).first()).toBeVisible();
+    await expect(page.getByText(/1200/).first()).toBeVisible();
   });
 
   test('tase tasapainossa kaikilla kuukausivalinnoilla', async ({ page }) => {
@@ -68,14 +65,16 @@ test.describe('Raportit — sisältö', () => {
   test('liikevaihto-osio näyttää 3000 Myynti palvelumyynti', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Raportit' }).click();
-    await expect(page.getByText(/LIIKEVAIHTO/i)).toBeVisible();
-    await expect(page.getByText(/3000/)).toBeVisible();
+    // "LIIKEVAIHTO" (exact) and "Liikevaihto yhteensä" are both present — use exact match
+    await expect(page.getByText('LIIKEVAIHTO', { exact: true })).toBeVisible();
+    await expect(page.getByText(/3000/).first()).toBeVisible();
   });
 
   test('vastaavaa-osio sisältää pankkitilin', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Raportit' }).click();
-    await expect(page.getByText(/VASTAAVAA/i)).toBeVisible();
-    await expect(page.getByText(/1910/)).toBeVisible();
+    // "VASTAAVAA" (exact) and "Vastaavaa yhteensä" are both present — use exact match
+    await expect(page.getByText('VASTAAVAA', { exact: true })).toBeVisible();
+    await expect(page.getByText(/1910/).first()).toBeVisible();
   });
 });

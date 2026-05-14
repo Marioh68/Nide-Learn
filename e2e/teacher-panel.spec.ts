@@ -88,9 +88,10 @@ test.describe('Opettajan paneeli — välilehtien hallinta', () => {
       await row.locator('.tp-checkbox').uncheck();
     }
 
-    // Try to uncheck the last one (Sanasto) — should remain checked
+    // Try to uncheck the last one (Sanasto) — guard should keep it checked.
+    // Use .click() not .uncheck() — uncheck() throws if state doesn't change.
     const sanastoRow = page.locator('.tp-tab-row', { hasText: 'Sanasto' });
-    await sanastoRow.locator('.tp-checkbox').uncheck();
+    await sanastoRow.locator('.tp-checkbox').click();
     await expect(sanastoRow.locator('.tp-checkbox')).toBeChecked();
   });
 });

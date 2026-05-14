@@ -10,10 +10,11 @@ test.describe('Helmikuu — intro ja ALV-kannat', () => {
 
   test('FebIntro näyttää otsikon ja ALV-kannat-boksin', async ({ page }) => {
     await expect(page.getByRole('heading', { name: /Helmikuu 2027 — Taso 2/ })).toBeVisible();
-    // ALV-kannat box with three rates
-    await expect(page.getByText('25,5 %')).toBeVisible();
-    await expect(page.getByText('13,5 %')).toBeVisible();
-    await expect(page.getByText('10,0 %')).toBeVisible();
+    // Scope to the rates box to avoid matching story paragraph text
+    const ratesBox = page.locator('.feb-intro-alv-rates');
+    await expect(ratesBox.locator('.feb-rate-25')).toBeVisible();
+    await expect(ratesBox.locator('.feb-rate-13')).toBeVisible();
+    await expect(ratesBox.locator('.feb-rate-10')).toBeVisible();
   });
 
   test('aloita-nappi siirtää harjoitusnäkymään', async ({ page }) => {
@@ -34,12 +35,12 @@ test.describe('Helmikuu — ALV 13,5 % (kirjakauppa)', () => {
   });
 
   test('DocumentCard näyttää ALV 13,5 % suomenkielisellä desimaalimerkillä', async ({ page }) => {
-    await expect(page.getByText('ALV 13,5 %')).toBeVisible();
-    await expect(page.getByText('45,40 €')).toBeVisible();
-    // Net amount
-    await expect(page.getByText('40,00 €')).toBeVisible();
-    // VAT amount
-    await expect(page.getByText('5,40 €')).toBeVisible();
+    const footer = page.locator('.doc-card-footer');
+    // Scope ALV label check to footer to avoid matching description text
+    await expect(footer.locator('.doc-alv-label', { hasText: 'ALV 13,5 %' })).toBeVisible();
+    await expect(footer.locator('.doc-alv-total-row .doc-amount')).toContainText('45,40');
+    await expect(footer.locator('.doc-alv-row').first().locator('.doc-alv-val')).toContainText('40,00');
+    await expect(footer.locator('.doc-alv-row').nth(1).locator('.doc-alv-val')).toContainText('5,40');
   });
 });
 
@@ -54,9 +55,10 @@ test.describe('Helmikuu — ALV 10 % (lehti)', () => {
   });
 
   test('DocumentCard näyttää ALV 10 % suomenkielisellä merkillä', async ({ page }) => {
-    await expect(page.getByText('ALV 10 %')).toBeVisible();
-    await expect(page.getByText('22,00 €')).toBeVisible();
-    await expect(page.getByText('2,00 €')).toBeVisible();
+    const footer = page.locator('.doc-card-footer');
+    await expect(footer.locator('.doc-alv-label', { hasText: 'ALV 10 %' })).toBeVisible();
+    await expect(footer.locator('.doc-alv-total-row .doc-amount')).toContainText('22,00');
+    await expect(footer.locator('.doc-alv-row').nth(1).locator('.doc-alv-val')).toContainText('2,00');
   });
 });
 
@@ -71,8 +73,10 @@ test.describe('Helmikuu — käyttöomaisuus (laptop)', () => {
   });
 
   test('käyttöomaisuuslasku näyttää 1 506 € ostovelkana', async ({ page }) => {
-    await expect(page.getByText('1 506,00 €')).toBeVisible();
-    await expect(page.getByText(/TechStore/i)).toBeVisible();
+    const footer = page.locator('.doc-card-footer');
+    await expect(footer.locator('.doc-amount')).toContainText('1 506,00');
+    // Vastapuoli-kenttä dd-elementissä (exact match avoids matching description)
+    await expect(page.getByText('TechStore Oy', { exact: true })).toBeVisible();
   });
 
   test('oikea vastaus 1200/2920/2520 hyväksytään tiliristikossa', async ({ page }) => {
@@ -112,7 +116,8 @@ test.describe('Helmikuu — poisto (muistiotosite)', () => {
   });
 
   test('poistokortti näyttää 20 € ja tyypin Muistiotosite', async ({ page }) => {
-    await expect(page.getByText('Muistiotosite')).toBeVisible();
-    await expect(page.getByText('20,00 €')).toBeVisible();
+    // Scope amount to doc-card-footer to avoid matching the description text "= 20,00 €"
+    await expect(page.locator('.doc-type-badge', { hasText: 'Muistiotosite' })).toBeVisible();
+    await expect(page.locator('.doc-card-footer .doc-amount')).toContainText('20,00');
   });
 });
