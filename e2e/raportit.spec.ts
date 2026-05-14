@@ -54,10 +54,17 @@ test.describe('Raportit — kuukausivalinnan vaikutus', () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Raportit' }).click();
     const sel = page.locator('#report-month-sel');
-    for (const idx of ['0', '1', '2', '3', '4']) {
+    for (const idx of ['0', '1', '2', '3', '4', '5']) {
       await sel.selectOption(idx);
       await expect(page.getByText('✓ Tase tasapainossa')).toBeVisible();
     }
+  });
+
+  test('maaliskuu sisältää 5000 Palkat', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Raportit' }).click();
+    await page.locator('#report-month-sel').selectOption('4');
+    await expect(page.getByText(/5000/).first()).toBeVisible();
   });
 });
 

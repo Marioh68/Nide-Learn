@@ -1,6 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
-// Teacher panel MVP — tab visibility + level selector
+// Teacher panel MVP — auth gate + tab visibility + level selector
 
 test.describe('Opettajan paneeli — avaus ja sulkeminen', () => {
   test('Opettaja-nappi näkyy headerissa', async ({ page }) => {
@@ -38,18 +38,48 @@ test.describe('Opettajan paneeli — avaus ja sulkeminen', () => {
   });
 });
 
-test.describe('Opettajan paneeli — välilehtien hallinta', () => {
-  test('paneeli listaa kaikki 6 välilehteä', async ({ page }) => {
+test.describe('Opettajan paneeli — kirjautuminen', () => {
+  test('paneeli näyttää kirjautumislomakkeen kun ei autentikoitu', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Opettaja' }).click();
-    // All tabs should have checkboxes
+    await expect(page.getByText('Opettajan kirjautuminen')).toBeVisible();
+    await expect(page.getByLabel('Opettajan salasana')).toBeVisible();
+  });
+
+  test('väärä salasana näyttää virheilmoituksen', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Opettaja' }).click();
+    await page.getByLabel('Opettajan salasana').fill('wrong-password');
+    await page.getByRole('button', { name: 'Kirjaudu' }).click();
+    await expect(page.getByText('Väärä salasana.')).toBeVisible();
+  });
+
+  test('kirjaudu-nappi on disabled kun salasanakenttä on tyhjä', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Opettaja' }).click();
+    await expect(page.getByRole('button', { name: 'Kirjaudu' })).toBeDisabled();
+  });
+});
+
+test.describe('Opettajan paneeli — välilehtien hallinta (vaatii kirjautumisen)', () => {
+  // Helper: opens panel and authenticates with env var password (fallback: empty env = skipped)
+  async function openAndAuth(page: Page) {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Opettaja' }).click();
+    const pass = process.env.TEACHER_PASS ?? 'e2etest';
+    await page.getByLabel('Opettajan salasana').fill(pass);
+    await page.getByRole('button', { name: 'Kirjaudu' }).click();
+    await page.waitForSelector('.tp-checkbox');
+  }
+
+  test('paneeli listaa kaikki 8 välilehteä', async ({ page }) => {
+    await openAndAuth(page);
     const checkboxes = page.locator('.tp-checkbox');
-    await expect(checkboxes).toHaveCount(6);
+    await expect(checkboxes).toHaveCount(8);
   });
 
   test('välilehden piilottaminen poistaa sen tab-palkista', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Opettaja' }).click();
+    await openAndAuth(page);
 
     // Find the Helmikuu checkbox and uncheck it
     const helmikuuRow = page.locator('.tp-tab-row', { hasText: 'Helmikuu' });
@@ -63,8 +93,7 @@ test.describe('Opettajan paneeli — välilehtien hallinta', () => {
   });
 
   test('piilotetun välilehden voi palauttaa näkyviin', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Opettaja' }).click();
+    await openAndAuth(page);
 
     // Hide Joulukuu
     const joulukuuRow = page.locator('.tp-tab-row', { hasText: 'Joulukuu' });
@@ -78,42 +107,46 @@ test.describe('Opettajan paneeli — välilehtien hallinta', () => {
   });
 
   test('viimeistä näkyvää välilehteä ei voi piilottaa', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Opettaja' }).click();
+    await openAndAuth(page);
 
     // Hide all tabs except one (Sanasto)
-    const tabNames = ['Marraskuu', 'Joulukuu', 'Tammikuu', 'Helmikuu', 'Raportit'];
+    const tabNames = ['Marraskuu', 'Joulukuu', 'Tammikuu', 'Helmikuu', 'Maaliskuu', 'Päiväkirja', 'Raportit'];
     for (const name of tabNames) {
       const row = page.locator('.tp-tab-row', { hasText: name });
       await row.locator('.tp-checkbox').uncheck();
     }
 
     // Try to uncheck the last one (Sanasto) — guard should keep it checked.
-    // Use .click() not .uncheck() — uncheck() throws if state doesn't change.
     const sanastoRow = page.locator('.tp-tab-row', { hasText: 'Sanasto' });
     await sanastoRow.locator('.tp-checkbox').click();
     await expect(sanastoRow.locator('.tp-checkbox')).toBeChecked();
   });
 });
 
-test.describe('Opettajan paneeli — tasonvalitsin', () => {
-  test('tasonvalitsin näyttää 4 tasoa', async ({ page }) => {
+test.describe('Opettajan paneeli — tasonvalitsin (vaatii kirjautumisen)', () => {
+  async function openAndAuth(page: Page) {
     await page.goto('/');
     await page.getByRole('button', { name: 'Opettaja' }).click();
+    const pass = process.env.TEACHER_PASS ?? 'e2etest';
+    await page.getByLabel('Opettajan salasana').fill(pass);
+    await page.getByRole('button', { name: 'Kirjaudu' }).click();
+    await page.waitForSelector('.tp-level-btn');
+  }
+
+  test('tasonvalitsin näyttää 4 tasoa', async ({ page }) => {
+    await openAndAuth(page);
     const levelBtns = page.locator('.tp-level-btn');
     await expect(levelBtns).toHaveCount(4);
   });
 
   test('taso 1 on oletuksena aktiivinen', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Opettaja' }).click();
+    await openAndAuth(page);
     const level1 = page.locator('.tp-level-btn').first();
     await expect(level1).toHaveClass(/tp-level-active/);
   });
 
   test('tason valinta päivittää kuvauksen', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Opettaja' }).click();
+    await openAndAuth(page);
     await page.locator('.tp-level-btn').nth(1).click(); // Taso 2
     await expect(page.getByText(/ALV.*käyttöomaisuus/i)).toBeVisible();
   });

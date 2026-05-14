@@ -7,6 +7,7 @@ import { novemberPhase2Exercises } from '@/data/exercises/november-phase2';
 import { decemberExercises } from '@/data/exercises/december';
 import { januaryExercises } from '@/data/exercises/january';
 import { februaryExercises } from '@/data/exercises/february';
+import { marchExercises } from '@/data/exercises/march';
 import { asiakastmiTilikartta } from '@/data/accounts/chart-of-accounts';
 
 const ALL_EXERCISES = [
@@ -15,14 +16,16 @@ const ALL_EXERCISES = [
   ...decemberExercises,
   ...januaryExercises,
   ...februaryExercises,
+  ...marchExercises,
 ];
 
 const MONTH_OPTIONS = [
-  { label: 'Marraskuu 2026',            maxOffset: 0 },
-  { label: 'Joulukuu 2026',             maxOffset: 1 },
-  { label: 'Tammikuu 2027 (ALV alkaa)', maxOffset: 2 },
-  { label: 'Helmikuu 2027',             maxOffset: 3 },
-  { label: 'Maaliskuu 2027 (ALV-maksu)',maxOffset: 4 },
+  { label: 'Marraskuu 2026',                         maxOffset: 0 },
+  { label: 'Joulukuu 2026',                          maxOffset: 1 },
+  { label: 'Tammikuu 2027 (ALV alkaa)',               maxOffset: 2 },
+  { label: 'Helmikuu 2027',                          maxOffset: 3 },
+  { label: 'Maaliskuu 2027 (ALV-maksu)',              maxOffset: 4 },
+  { label: 'Huhtikuu 2027 (sis. maalis. ALV-maksu)', maxOffset: 5 },
 ];
 
 // Format number Finnish locale, always 2 decimals
