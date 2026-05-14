@@ -8,6 +8,7 @@ import { TeacherProvider } from '@/contexts/TeacherContext';
 
 function Inner() {
   const [panelOpen, setPanelOpen] = useState(false);
+  const [teacherAuth, setTeacherAuth] = useState(false);
 
   return (
     <div className="page-shell">
@@ -16,7 +17,7 @@ function Inner() {
         <div className="page-header-actions">
           <ThemeSwitcher />
           <button
-            className="tp-toggle-btn"
+            className={`tp-toggle-btn ${teacherAuth ? 'tp-toggle-authed' : ''}`}
             onClick={() => setPanelOpen(true)}
             aria-label="Avaa opettajan asetukset"
           >
@@ -27,7 +28,12 @@ function Inner() {
       <main className="page-main">
         <DemoTabs />
       </main>
-      <TeacherPanel open={panelOpen} onClose={() => setPanelOpen(false)} />
+      <TeacherPanel
+        open={panelOpen}
+        onClose={() => setPanelOpen(false)}
+        authenticated={teacherAuth}
+        onAuthenticated={() => setTeacherAuth(true)}
+      />
     </div>
   );
 }

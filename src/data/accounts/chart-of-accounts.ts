@@ -20,11 +20,18 @@ export const asiakastmiTilikartta: KirjanpitoTili[] = [
   { numero: '3000', nimi: 'Myynti, palvelumyynti',           kategoria: 'tuotot', kayttoonotto: 0 },
   { numero: '3010', nimi: 'Myynti, edelleenveloitettava',    kategoria: 'tuotot', kayttoonotto: 1 },
 
+  // ── Vastattavaa — palkkavelat (Taso 3) ────────────────────────────────────
+  { numero: '2910', nimi: 'Palkkavelka',                     kategoria: 'vastattavaa', kayttoonotto: 4 },
+  { numero: '2960', nimi: 'Ennakonpidätysvelka',             kategoria: 'vastattavaa', kayttoonotto: 4 },
+  { numero: '2970', nimi: 'Sosiaaliturvamaksuvelka',         kategoria: 'vastattavaa', kayttoonotto: 4 },
+
   // ── Kulut ──────────────────────────────────────────────────────────────────
   { numero: '4000', nimi: 'Aineet ja tarvikkeet',            kategoria: 'kulut', kayttoonotto: 0 },
   { numero: '4500', nimi: 'Ulkopuoliset palvelut',           kategoria: 'kulut', kayttoonotto: 1 },
-  { numero: '8390', nimi: 'Tietotekniikkakulut',             kategoria: 'kulut', kayttoonotto: 0 },
+  { numero: '5000', nimi: 'Palkat ja palkkiot',              kategoria: 'kulut', kayttoonotto: 4 },
+  { numero: '5300', nimi: 'Työnantajan sotumaksut',          kategoria: 'kulut', kayttoonotto: 4 },
   { numero: '7680', nimi: 'Poistot koneista ja kalustosta',  kategoria: 'kulut', kayttoonotto: 3 },
+  { numero: '8390', nimi: 'Tietotekniikkakulut',             kategoria: 'kulut', kayttoonotto: 0 },
   { numero: '8400', nimi: 'Liiketoiminnan muut kulut',       kategoria: 'kulut', kayttoonotto: 0 },
 ];
 

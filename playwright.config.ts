@@ -20,7 +20,12 @@ export default defineConfig({
   webServer: {
     command: 'pnpm dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
     timeout: 60_000,
+    env: {
+      // Use the env var if set, otherwise fall back to the fixed E2E test value.
+      // CI sets TEACHER_PASS as an env var; local dev can override via .env.local.
+      TEACHER_PASS: process.env.TEACHER_PASS ?? 'e2etest',
+    },
   },
 });

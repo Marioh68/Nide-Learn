@@ -6,6 +6,7 @@ import { novemberPhase2Exercises } from '@/data/exercises/november-phase2';
 import { decemberExercises } from '@/data/exercises/december';
 import { januaryExercises } from '@/data/exercises/january';
 import { februaryExercises } from '@/data/exercises/february';
+import { marchExercises } from '@/data/exercises/march';
 import { asiakastmiTilikartta } from '@/data/accounts/chart-of-accounts';
 import { computeReports } from '@/utils/reportEngine';
 
@@ -15,6 +16,7 @@ const ALL_EXERCISES = [
   ...decemberExercises,
   ...januaryExercises,
   ...februaryExercises,
+  ...marchExercises,
 ];
 
 const MONTH_OPTIONS = [
@@ -22,7 +24,8 @@ const MONTH_OPTIONS = [
   { label: 'Joulukuu 2026',  maxOffset: 1 },
   { label: 'Tammikuu 2027',  maxOffset: 2 },
   { label: 'Helmikuu 2027',  maxOffset: 3 },
-  { label: 'Maaliskuu 2027 (sis. helmik. ALV-maksu)', maxOffset: 4 },
+  { label: 'Maaliskuu 2027',  maxOffset: 4 },
+  { label: 'Huhtikuu 2027 (sis. maalis. ALV-maksu)', maxOffset: 5 },
 ];
 
 const fmt = (n: number) => n.toLocaleString('fi-FI', { minimumFractionDigits: 2 });

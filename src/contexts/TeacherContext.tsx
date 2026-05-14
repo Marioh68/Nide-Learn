@@ -2,10 +2,10 @@
 
 import { createContext, useContext, useState } from 'react';
 
-export type TabId = 'sanasto' | 'marraskuu' | 'joulukuu' | 'tammikuu' | 'helmikuu' | 'raportit';
+export type TabId = 'sanasto' | 'marraskuu' | 'joulukuu' | 'tammikuu' | 'helmikuu' | 'maaliskuu' | 'paivakirja' | 'raportit';
 
 export const ALL_TABS: TabId[] = [
-  'sanasto', 'marraskuu', 'joulukuu', 'tammikuu', 'helmikuu', 'raportit',
+  'sanasto', 'marraskuu', 'joulukuu', 'tammikuu', 'helmikuu', 'maaliskuu', 'paivakirja', 'raportit',
 ];
 
 interface TeacherContextValue {
