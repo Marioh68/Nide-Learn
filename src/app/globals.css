@@ -1318,3 +1318,366 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-text);
 }
 .doc-card-tiliotetapahtuma .doc-card-header { background: #2c7873; }
+
+/* ─── February intro — ALV-kannat box ───────────────────────────────────── */
+
+.feb-intro-alv-rates {
+  width: 100%;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+.feb-intro-rates-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.1rem;
+}
+.feb-intro-rate-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.feb-rate-pct {
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 8px;
+  border-radius: 4px;
+  min-width: 3.5rem;
+  text-align: center;
+}
+.feb-rate-25 { background: #e3f2fd; color: #1565c0; }
+.feb-rate-13 { background: #e8f5ed; color: var(--color-success); }
+.feb-rate-10 { background: #fff7e6; color: #c07800; }
+.feb-rate-desc {
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+/* February summary hero variant */
+.ns-hero-feb .ns-hero-icon {
+  background: #f3e8ff;
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+
+/* ─── ReportView ─────────────────────────────────────────────────────────── */
+
+.report-view {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.report-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.report-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.report-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0.15rem 0 0;
+}
+
+.report-period-sel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.report-period-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+.report-select {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.report-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.report-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  padding: 0.65rem 1rem;
+  background: var(--color-surface-raised);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.report-table th,
+.report-table td {
+  padding: 0.4rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border-subtle);
+  color: var(--color-text);
+}
+.report-table th {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  background: var(--color-surface-raised);
+}
+.report-num-col { text-align: right; font-variant-numeric: tabular-nums; }
+.report-indent { padding-left: 2rem !important; }
+.report-group-header td {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  background: var(--color-surface-raised);
+  padding-top: 0.6rem;
+}
+.report-total-row td {
+  font-weight: 700;
+  border-top: 2px solid var(--color-border);
+  background: var(--color-surface-raised);
+}
+.report-result-row td {
+  font-size: 1rem;
+  border-top: 2px solid var(--color-border);
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.report-cat-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.report-cat-vastaavaa  { background: #1c5fa6; }
+.report-cat-vastattavaa{ background: #7d3f8c; }
+.report-cat-tuotot     { background: #1a7a4e; }
+.report-cat-kulut      { background: #c0392b; }
+
+.report-balance-ok { color: var(--color-success); font-size: 0.85rem; font-weight: 600; }
+.report-balance-err { color: var(--color-error); font-size: 0.85rem; font-weight: 600; }
+.report-pos { color: var(--color-success); }
+.report-neg { color: var(--color-error); }
+
+/* Tase two-column grid */
+.report-tase-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.report-tase-grid > div + div {
+  border-left: 1px solid var(--color-border-subtle);
+}
+.report-tase-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  background: var(--color-surface-raised);
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.report-tase-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: 0.875rem;
+}
+.report-tase-result-row { background: var(--color-surface-raised); }
+.report-tase-name { color: var(--color-text); }
+.report-tase-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  background: var(--color-surface-raised);
+  border-top: 2px solid var(--color-border);
+}
+.report-balance-cell { white-space: nowrap; }
+
+@media (max-width: 600px) {
+  .report-tase-grid { grid-template-columns: 1fr; }
+  .report-tase-grid > div + div { border-left: none; border-top: 1px solid var(--color-border); }
+}
+
+/* ─── Teacher panel ──────────────────────────────────────────────────────── */
+
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tp-toggle-btn {
+  padding: 0.35rem 0.85rem;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-btn);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.tp-toggle-btn:hover { background: var(--color-secondary); }
+
+.tp-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 200;
+}
+
+.tp-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(340px, 92vw);
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.tp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  flex-shrink: 0;
+}
+.tp-header-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+.tp-close-btn {
+  background: none;
+  border: none;
+  color: var(--color-primary-foreground);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+.tp-close-btn:hover { opacity: 1; }
+
+.tp-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.tp-section { display: flex; flex-direction: column; gap: 0.5rem; }
+.tp-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.15rem;
+}
+
+.tp-tab-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s;
+}
+.tp-tab-row:hover { background: var(--color-surface-raised); }
+.tp-checkbox { width: 1rem; height: 1rem; cursor: pointer; accent-color: var(--color-primary); }
+.tp-tab-label { font-size: 0.9rem; color: var(--color-text); }
+
+.tp-level-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+}
+.tp-level-btn {
+  padding: 0.5rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+.tp-level-btn:hover { background: var(--color-surface-raised); }
+.tp-level-active {
+  background: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-primary-foreground) !important;
+}
+.tp-level-desc {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.tp-notice {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  background: var(--color-surface-raised);
+  border-left: 3px solid var(--color-border);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  line-height: 1.5;
+}

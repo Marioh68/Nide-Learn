@@ -5,21 +5,36 @@ import { VocabularyExercise } from '@/components/VocabularyExercise';
 import { ExerciseFlow } from '@/components/ExerciseFlow';
 import { ProgressTracker } from '@/components/ProgressTracker';
 import { MonthIntro } from '@/components/MonthIntro';
+import { ReportView } from '@/components/ReportView';
 import { level1Vocabulary } from '@/data/vocabulary/level-1';
 import { novemberPhase1Exercises } from '@/data/exercises/november-phase1';
 import { novemberPhase2Exercises } from '@/data/exercises/november-phase2';
 import { decemberExercises } from '@/data/exercises/december';
 import { januaryExercises } from '@/data/exercises/january';
+import { februaryExercises } from '@/data/exercises/february';
 import { useTheme } from '@/hooks/useTheme';
+import { useTeacher } from '@/contexts/TeacherContext';
+import type { TabId } from '@/contexts/TeacherContext';
 import type { DocumentStatus } from '@/types/exercises';
 
-type Tab = 'sanasto' | 'marraskuu' | 'joulukuu' | 'tammikuu';
+const TAB_LABELS: Record<TabId, string> = {
+  sanasto:   'Sanasto',
+  marraskuu: 'Tositekirjaus — Marraskuu',
+  joulukuu:  'Tositekirjaus — Joulukuu',
+  tammikuu:  'Tositekirjaus — Tammikuu (ALV)',
+  helmikuu:  'Tositekirjaus — Helmikuu (Taso 2)',
+  raportit:  'Raportit',
+};
 
 const allNovemberExercises = [...novemberPhase1Exercises, ...novemberPhase2Exercises];
 
 export function DemoTabs() {
-  const [tab, setTab] = useState<Tab>('sanasto');
+  const { visibleTabs } = useTeacher();
+  const [tab, setTab] = useState<TabId>('sanasto');
   const { theme } = useTheme();
+
+  // Derived: if current tab is hidden, fall back to first visible
+  const effectiveTab: TabId = visibleTabs.includes(tab) ? tab : (visibleTabs[0] ?? 'sanasto');
 
   // ── November state ──────────────────────────────────────────────────────────
   const [novIntroSeen, setNovIntroSeen] = useState(false);
@@ -45,116 +60,83 @@ export function DemoTabs() {
     januaryExercises.map(() => 'aloittamatta'),
   );
 
+  // ── February state ──────────────────────────────────────────────────────────
+  const [febIntroSeen, setFebIntroSeen] = useState(false);
+  const [febIndex, setFebIndex] = useState(0);
+  const [febDone, setFebDone] = useState(false);
+  const [febStatuses, setFebStatuses] = useState<DocumentStatus[]>(
+    februaryExercises.map(() => 'aloittamatta'),
+  );
+
   // ── November handlers ───────────────────────────────────────────────────────
   function handleNovComplete() {
     const isLast = novIndex === allNovemberExercises.length - 1;
-    setNovStatuses((prev) => {
-      const n = [...prev];
-      n[novIndex] = 'valmis';
-      return n;
-    });
-    if (isLast) {
-      setNovDone(true);
-    } else {
-      setNovIndex((i) => i + 1);
-    }
+    setNovStatuses((prev) => { const n = [...prev]; n[novIndex] = 'valmis'; return n; });
+    if (isLast) setNovDone(true);
+    else setNovIndex((i) => i + 1);
   }
-
   function handleNovSelect(index: number) {
     setNovIndex(index);
-    if (novStatuses[index] === 'aloittamatta') {
-      setNovStatuses((prev) => {
-        const n = [...prev];
-        n[index] = 'kesken';
-        return n;
-      });
-    }
-  }
-
-  // ── January handlers ────────────────────────────────────────────────────────
-  function handleJanComplete() {
-    const isLast = janIndex === januaryExercises.length - 1;
-    setJanStatuses((prev) => {
-      const n = [...prev];
-      n[janIndex] = 'valmis';
-      return n;
-    });
-    if (isLast) {
-      setJanDone(true);
-    } else {
-      setJanIndex((i) => i + 1);
-    }
-  }
-
-  function handleJanSelect(index: number) {
-    setJanIndex(index);
-    if (janStatuses[index] === 'aloittamatta') {
-      setJanStatuses((prev) => {
-        const n = [...prev];
-        n[index] = 'kesken';
-        return n;
-      });
-    }
+    if (novStatuses[index] === 'aloittamatta')
+      setNovStatuses((prev) => { const n = [...prev]; n[index] = 'kesken'; return n; });
   }
 
   // ── December handlers ───────────────────────────────────────────────────────
   function handleDecComplete() {
     const isLast = decIndex === decemberExercises.length - 1;
-    setDecStatuses((prev) => {
-      const n = [...prev];
-      n[decIndex] = 'valmis';
-      return n;
-    });
-    if (isLast) {
-      setDecDone(true);
-    } else {
-      setDecIndex((i) => i + 1);
-    }
+    setDecStatuses((prev) => { const n = [...prev]; n[decIndex] = 'valmis'; return n; });
+    if (isLast) setDecDone(true);
+    else setDecIndex((i) => i + 1);
   }
-
   function handleDecSelect(index: number) {
     setDecIndex(index);
-    if (decStatuses[index] === 'aloittamatta') {
-      setDecStatuses((prev) => {
-        const n = [...prev];
-        n[index] = 'kesken';
-        return n;
-      });
-    }
+    if (decStatuses[index] === 'aloittamatta')
+      setDecStatuses((prev) => { const n = [...prev]; n[index] = 'kesken'; return n; });
+  }
+
+  // ── January handlers ────────────────────────────────────────────────────────
+  function handleJanComplete() {
+    const isLast = janIndex === januaryExercises.length - 1;
+    setJanStatuses((prev) => { const n = [...prev]; n[janIndex] = 'valmis'; return n; });
+    if (isLast) setJanDone(true);
+    else setJanIndex((i) => i + 1);
+  }
+  function handleJanSelect(index: number) {
+    setJanIndex(index);
+    if (janStatuses[index] === 'aloittamatta')
+      setJanStatuses((prev) => { const n = [...prev]; n[index] = 'kesken'; return n; });
+  }
+
+  // ── February handlers ───────────────────────────────────────────────────────
+  function handleFebComplete() {
+    const isLast = febIndex === februaryExercises.length - 1;
+    setFebStatuses((prev) => { const n = [...prev]; n[febIndex] = 'valmis'; return n; });
+    if (isLast) setFebDone(true);
+    else setFebIndex((i) => i + 1);
+  }
+  function handleFebSelect(index: number) {
+    setFebIndex(index);
+    if (febStatuses[index] === 'aloittamatta')
+      setFebStatuses((prev) => { const n = [...prev]; n[index] = 'kesken'; return n; });
   }
 
   return (
     <>
       {/* Tab bar */}
       <div className="demo-tabs">
-        <button
-          className={`demo-tab ${tab === 'sanasto' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('sanasto')}
-        >
-          Sanasto
-        </button>
-        <button
-          className={`demo-tab ${tab === 'marraskuu' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('marraskuu')}
-        >
-          Tositekirjaus — Marraskuu
-        </button>
-        <button
-          className={`demo-tab ${tab === 'joulukuu' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('joulukuu')}
-        >
-          Tositekirjaus — Joulukuu
-        </button>
-        <button
-          className={`demo-tab ${tab === 'tammikuu' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('tammikuu')}
-        >
-          Tositekirjaus — Tammikuu (ALV)
-        </button>
+        {visibleTabs.map((t) => (
+          <button
+            key={t}
+            className={`demo-tab ${effectiveTab === t ? 'demo-tab-active' : ''}`}
+            onClick={() => setTab(t)}
+          >
+            {TAB_LABELS[t]}
+          </button>
+        ))}
       </div>
 
       {/* ── SANASTO ─────────────────────────────────────────────────────────── */}
-      {tab === 'sanasto' && (
+      {effectiveTab === 'sanasto' && (
         <div className="demo-pane">
           <h1 className="demo-h1">Kirjanpidon perussanasto — Taso 1</h1>
           <p className="demo-lead">
@@ -164,141 +146,111 @@ export function DemoTabs() {
         </div>
       )}
 
-      {/* ── MARRASKUU — intro ────────────────────────────────────────────────── */}
-      {tab === 'marraskuu' && !novIntroSeen && (
-        <div className="demo-pane">
-          <MonthIntro onStart={() => setNovIntroSeen(true)} />
-        </div>
+      {/* ── MARRASKUU ────────────────────────────────────────────────────────── */}
+      {effectiveTab === 'marraskuu' && !novIntroSeen && (
+        <div className="demo-pane"><MonthIntro onStart={() => setNovIntroSeen(true)} /></div>
       )}
-
-      {/* ── MARRASKUU — harjoitukset ─────────────────────────────────────────── */}
-      {tab === 'marraskuu' && novIntroSeen && !novDone && (
+      {effectiveTab === 'marraskuu' && novIntroSeen && !novDone && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
-            <ProgressTracker
-              exercises={allNovemberExercises}
-              statuses={novStatuses}
-              currentIndex={novIndex}
-              onSelect={handleNovSelect}
-            />
+            <ProgressTracker exercises={allNovemberExercises} statuses={novStatuses} currentIndex={novIndex} onSelect={handleNovSelect} />
           </aside>
           <div className="demo-exercise-area">
-            <ExerciseFlow
-              key={novIndex}
-              exercise={allNovemberExercises[novIndex]}
-              theme={theme}
-              onComplete={handleNovComplete}
-            />
+            <ExerciseFlow key={novIndex} exercise={allNovemberExercises[novIndex]} theme={theme} onComplete={handleNovComplete} />
           </div>
         </div>
       )}
-
-      {/* ── MARRASKUU — koonti ───────────────────────────────────────────────── */}
-      {tab === 'marraskuu' && novIntroSeen && novDone && (
+      {effectiveTab === 'marraskuu' && novIntroSeen && novDone && (
         <div className="demo-pane">
           <NovemberSummary
-            onRestart={() => {
-              setNovDone(false);
-              setNovIndex(0);
-              setNovStatuses(allNovemberExercises.map(() => 'aloittamatta'));
-            }}
+            onRestart={() => { setNovDone(false); setNovIndex(0); setNovStatuses(allNovemberExercises.map(() => 'aloittamatta')); }}
             onNext={() => setTab('joulukuu')}
           />
         </div>
       )}
 
-      {/* ── JOULUKUU — intro ────────────────────────────────────────────────── */}
-      {tab === 'joulukuu' && !decIntroSeen && (
-        <div className="demo-pane">
-          <DecemberIntro onStart={() => setDecIntroSeen(true)} />
-        </div>
+      {/* ── JOULUKUU ─────────────────────────────────────────────────────────── */}
+      {effectiveTab === 'joulukuu' && !decIntroSeen && (
+        <div className="demo-pane"><DecemberIntro onStart={() => setDecIntroSeen(true)} /></div>
       )}
-
-      {/* ── JOULUKUU — harjoitukset ──────────────────────────────────────────── */}
-      {tab === 'joulukuu' && decIntroSeen && !decDone && (
+      {effectiveTab === 'joulukuu' && decIntroSeen && !decDone && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
-            <ProgressTracker
-              exercises={decemberExercises}
-              statuses={decStatuses}
-              currentIndex={decIndex}
-              onSelect={handleDecSelect}
-            />
+            <ProgressTracker exercises={decemberExercises} statuses={decStatuses} currentIndex={decIndex} onSelect={handleDecSelect} />
           </aside>
           <div className="demo-exercise-area">
-            <ExerciseFlow
-              key={decIndex}
-              exercise={decemberExercises[decIndex]}
-              theme={theme}
-              onComplete={handleDecComplete}
-            />
+            <ExerciseFlow key={decIndex} exercise={decemberExercises[decIndex]} theme={theme} onComplete={handleDecComplete} />
           </div>
         </div>
       )}
-
-      {/* ── JOULUKUU — koonti ───────────────────────────────────────────────── */}
-      {tab === 'joulukuu' && decIntroSeen && decDone && (
+      {effectiveTab === 'joulukuu' && decIntroSeen && decDone && (
         <div className="demo-pane">
           <DecemberSummary
-            onRestart={() => {
-              setDecDone(false);
-              setDecIndex(0);
-              setDecStatuses(decemberExercises.map(() => 'aloittamatta'));
-            }}
+            onRestart={() => { setDecDone(false); setDecIndex(0); setDecStatuses(decemberExercises.map(() => 'aloittamatta')); }}
             onNext={() => setTab('tammikuu')}
           />
         </div>
       )}
 
-      {/* ── TAMMIKUU — intro ─────────────────────────────────────────────────── */}
-      {tab === 'tammikuu' && !janIntroSeen && (
-        <div className="demo-pane">
-          <JanuaryIntro onStart={() => setJanIntroSeen(true)} />
-        </div>
+      {/* ── TAMMIKUU ─────────────────────────────────────────────────────────── */}
+      {effectiveTab === 'tammikuu' && !janIntroSeen && (
+        <div className="demo-pane"><JanuaryIntro onStart={() => setJanIntroSeen(true)} /></div>
       )}
-
-      {/* ── TAMMIKUU — harjoitukset ──────────────────────────────────────────── */}
-      {tab === 'tammikuu' && janIntroSeen && !janDone && (
+      {effectiveTab === 'tammikuu' && janIntroSeen && !janDone && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
-            <ProgressTracker
-              exercises={januaryExercises}
-              statuses={janStatuses}
-              currentIndex={janIndex}
-              onSelect={handleJanSelect}
-            />
+            <ProgressTracker exercises={januaryExercises} statuses={janStatuses} currentIndex={janIndex} onSelect={handleJanSelect} />
           </aside>
           <div className="demo-exercise-area">
-            <ExerciseFlow
-              key={janIndex}
-              exercise={januaryExercises[janIndex]}
-              theme={theme}
-              onComplete={handleJanComplete}
-            />
+            <ExerciseFlow key={janIndex} exercise={januaryExercises[janIndex]} theme={theme} onComplete={handleJanComplete} />
           </div>
         </div>
       )}
-
-      {/* ── TAMMIKUU — koonti ───────────────────────────────────────────────── */}
-      {tab === 'tammikuu' && janIntroSeen && janDone && (
+      {effectiveTab === 'tammikuu' && janIntroSeen && janDone && (
         <div className="demo-pane">
           <JanuarySummary
-            onRestart={() => {
-              setJanDone(false);
-              setJanIndex(0);
-              setJanStatuses(januaryExercises.map(() => 'aloittamatta'));
-            }}
+            onRestart={() => { setJanDone(false); setJanIndex(0); setJanStatuses(januaryExercises.map(() => 'aloittamatta')); }}
+            onNext={() => setTab('helmikuu')}
           />
+        </div>
+      )}
+
+      {/* ── HELMIKUU ─────────────────────────────────────────────────────────── */}
+      {effectiveTab === 'helmikuu' && !febIntroSeen && (
+        <div className="demo-pane"><FebIntro onStart={() => setFebIntroSeen(true)} /></div>
+      )}
+      {effectiveTab === 'helmikuu' && febIntroSeen && !febDone && (
+        <div className="demo-pane demo-pane-split">
+          <aside className="demo-sidebar">
+            <ProgressTracker exercises={februaryExercises} statuses={febStatuses} currentIndex={febIndex} onSelect={handleFebSelect} />
+          </aside>
+          <div className="demo-exercise-area">
+            <ExerciseFlow key={febIndex} exercise={februaryExercises[febIndex]} theme={theme} onComplete={handleFebComplete} />
+          </div>
+        </div>
+      )}
+      {effectiveTab === 'helmikuu' && febIntroSeen && febDone && (
+        <div className="demo-pane">
+          <FebSummary
+            onRestart={() => { setFebDone(false); setFebIndex(0); setFebStatuses(februaryExercises.map(() => 'aloittamatta')); }}
+            onNext={() => setTab('raportit')}
+          />
+        </div>
+      )}
+
+      {/* ── RAPORTIT ─────────────────────────────────────────────────────────── */}
+      {effectiveTab === 'raportit' && (
+        <div className="demo-pane">
+          <ReportView />
         </div>
       )}
     </>
   );
 }
 
-// ─── November summary screen ───────────────────────────────────────────────────
+// ─── November summary ──────────────────────────────────────────────────────────
 
 const NOVEMBER_RECAP = [
-  // Phase 1 — 8 tositetta
   { id: 'ys-001',           type: 'Yksityissijoitus',            debet: '1910 Pankkitili',                 kredit: '2080 Yksityistili',              note: '' },
   { id: 'yn-001',           type: 'Yksityisnosto',               debet: '2080 Yksityistili',               kredit: '1910 Pankkitili',                note: '' },
   { id: '2026-001',         type: 'Myyntilasku (PixelPro)',       debet: '1700 Myyntisaamiset',             kredit: '3000 Myynti, palvelumyynti',     note: '' },
@@ -307,7 +259,6 @@ const NOVEMBER_RECAP = [
   { id: 'lp-1142',          type: 'Ostolasku — Langaton Piste',   debet: '8400 Liiketoiminnan muut kulut',  kredit: '2520 Ostovelat',                 note: '' },
   { id: 'tiliote-001',      type: 'Tiliote — myyntisuoritus',     debet: '1910 Pankkitili',                 kredit: '1700 Myyntisaamiset',            note: '' },
   { id: 'tiliote-002',      type: 'Tiliote — ostovelan maksu',    debet: '2520 Ostovelat',                  kredit: '1910 Pankkitili',                note: '' },
-  // Phase 2 — 9 tositetta
   { id: '2026-002',         type: 'Myyntilasku (Aalto)',          debet: '1700 Myyntisaamiset',             kredit: '3000 Myynti, palvelumyynti',     note: '' },
   { id: 'kuitti-tankki24',  type: 'Kuitti — polttoaine',          debet: '8400 Liiketoiminnan muut kulut',  kredit: '1910 Pankkitili',                note: '' },
   { id: '2026-003',         type: 'Myyntilasku (Vehka)',          debet: '1700 Myyntisaamiset',             kredit: '3000 Myynti, palvelumyynti',     note: '' },
@@ -319,13 +270,7 @@ const NOVEMBER_RECAP = [
   { id: 'kuitti-netcom',    type: 'Kuitti — NetCom 4G',           debet: '8390 Tietotekniikkakulut',        kredit: '1910 Pankkitili',                note: '' },
 ];
 
-function NovemberSummary({
-  onRestart,
-  onNext,
-}: {
-  onRestart: () => void;
-  onNext: () => void;
-}) {
+function NovemberSummary({ onRestart, onNext }: { onRestart: () => void; onNext: () => void }) {
   return (
     <div className="ns-root">
       <div className="ns-hero">
@@ -334,7 +279,6 @@ function NovemberSummary({
         <p className="ns-hero-sub">Kati Mäkisen tmi — 17 tositetta kirjattu</p>
       </div>
 
-      {/* Recap table */}
       <div className="ns-section">
         <h3 className="ns-section-title">Kirjausten koonti</h3>
         <table className="ns-table">
@@ -349,10 +293,7 @@ function NovemberSummary({
             {NOVEMBER_RECAP.map((r) => (
               <tr key={r.id} className="ns-tr">
                 <td className="ns-td ns-td-type">{r.type}</td>
-                <td className="ns-td">
-                  {r.debet}
-                  {r.note && <span className="ns-note"> {r.note}</span>}
-                </td>
+                <td className="ns-td">{r.debet}{r.note && <span className="ns-note"> {r.note}</span>}</td>
                 <td className="ns-td">{r.kredit}</td>
               </tr>
             ))}
@@ -360,46 +301,26 @@ function NovemberSummary({
         </table>
       </div>
 
-      {/* Pedagogical note: 4000 vs 8400 */}
       <div className="ns-section">
         <h3 className="ns-section-title">Muista: 4000 vai 8400?</h3>
         <div className="ns-compare">
           <div className="ns-compare-card ns-compare-4000">
             <div className="ns-compare-account">4000 Aineet ja tarvikkeet</div>
-            <p className="ns-compare-rule">
-              <strong>Muuttuva kulu</strong> — tavara myydään asiakkaalle tai käytetään
-              suoraan myytävän tuotteen valmistukseen.
-            </p>
-            <p className="ns-compare-example">
-              Esim. Katin tarralappuja asiakkaan pakettiin, printterimusteet asiakkaan
-              aineistoa varten, pakkausmateriaalit toimitettavaan tuotteeseen.
-            </p>
+            <p className="ns-compare-rule"><strong>Muuttuva kulu</strong> — tavara myydään asiakkaalle tai käytetään suoraan myytävän tuotteen valmistukseen.</p>
+            <p className="ns-compare-example">Esim. Katin tarralappuja asiakkaan pakettiin, printterimusteet asiakkaan aineistoa varten, pakkausmateriaalit toimitettavaan tuotteeseen.</p>
           </div>
           <div className="ns-compare-card ns-compare-8400">
             <div className="ns-compare-account">8400 Liiketoiminnan muut kulut</div>
-            <p className="ns-compare-rule">
-              <strong>Yleiskulu</strong> — kulu ei vaikuta suoraan liikevaihtoon eikä
-              päädy asiakkaan tuotteeseen.
-            </p>
-            <p className="ns-compare-example">
-              Esim. toimistotarvikkeet omaan käyttöön, polttoaine, postimaksut,
-              vuokra, vakuutukset, koulutus.
-            </p>
+            <p className="ns-compare-rule"><strong>Yleiskulu</strong> — kulu ei vaikuta suoraan liikevaihtoon eikä päädy asiakkaan tuotteeseen.</p>
+            <p className="ns-compare-example">Esim. toimistotarvikkeet omaan käyttöön, polttoaine, postimaksut, vuokra, vakuutukset, koulutus.</p>
           </div>
         </div>
-        <p className="ns-compare-tip">
-          Katin tarralappuja myydään asiakkaalle → <strong>4000</strong>.
-          Toimistokynät omaan käyttöön → <strong>8400</strong>.
-        </p>
+        <p className="ns-compare-tip">Katin tarralappuja myydään asiakkaalle → <strong>4000</strong>. Toimistokynät omaan käyttöön → <strong>8400</strong>.</p>
       </div>
 
-      {/* Opening balances preview */}
       <div className="ns-section">
         <h3 className="ns-section-title">Joulukuun alkusaldot</h3>
-        <p className="ns-balances-intro">
-          Marraskuun avoimet erät siirtyvät joulukuun alkusaldoiksi. Nämä näkyvät
-          joulukuun tositteissa:
-        </p>
+        <p className="ns-balances-intro">Marraskuun avoimet erät siirtyvät joulukuun alkusaldoiksi.</p>
         <table className="ns-table ns-balances-table">
           <thead>
             <tr>
@@ -429,18 +350,14 @@ function NovemberSummary({
       </div>
 
       <div className="ns-actions">
-        <button className="ns-restart-btn" onClick={onRestart}>
-          Aloita marraskuu uudelleen
-        </button>
-        <button className="ns-next-btn" onClick={onNext}>
-          Siirry joulukuuhun →
-        </button>
+        <button className="ns-restart-btn" onClick={onRestart}>Aloita marraskuu uudelleen</button>
+        <button className="ns-next-btn" onClick={onNext}>Siirry joulukuuhun →</button>
       </div>
     </div>
   );
 }
 
-// ─── December intro screen ─────────────────────────────────────────────────────
+// ─── December intro ────────────────────────────────────────────────────────────
 
 function DecemberIntro({ onStart }: { onStart: () => void }) {
   return (
@@ -448,20 +365,9 @@ function DecemberIntro({ onStart }: { onStart: () => void }) {
       <div className="month-intro-icon">📋</div>
       <h2 className="month-intro-title">Joulukuu 2026</h2>
       <div className="month-intro-story">
-        <p>
-          Marraskuu on kirjattu — hyvä työ! Nyt avautuu joulukuu. Katin yritys on
-          kasvanut: hän ottaa vastaan edelleenveloitustöitä, joissa tilaa palvelun
-          alihankkijalta ja laskuttaa sen eteenpäin asiakkaalle.
-        </p>
-        <p>
-          Joulukuun alussa kirjanpidossa näkyy marraskuun <strong>avoimet erät</strong>:
-          kaksi maksamatonta myyntilaskua (myyntisaamiset) ja yksi maksamaton ostolasku
-          (ostovelka). Nämä sulkeutuvat, kun maksut saapuvat tilioteelle.
-        </p>
-        <p>
-          Uutena tilinä tulee <strong>4500 Ulkopuoliset palvelut</strong> — kun Kati
-          tilaa painotyön alihankkijalta suoraan asiakkaan toimeksiantoon.
-        </p>
+        <p>Marraskuu on kirjattu — hyvä työ! Nyt avautuu joulukuu. Katin yritys on kasvanut: hän ottaa vastaan edelleenveloitustöitä, joissa tilaa palvelun alihankkijalta ja laskuttaa sen eteenpäin asiakkaalle.</p>
+        <p>Joulukuun alussa kirjanpidossa näkyy marraskuun <strong>avoimet erät</strong>: kaksi maksamatonta myyntilaskua (myyntisaamiset) ja yksi maksamaton ostolasku (ostovelka). Nämä sulkeutuvat, kun maksut saapuvat tilioteelle.</p>
+        <p>Uutena tilinä tulee <strong>4500 Ulkopuoliset palvelut</strong> — kun Kati tilaa painotyön alihankkijalta suoraan asiakkaan toimeksiantoon.</p>
       </div>
       <div className="month-intro-meta">
         <span>📅 Joulukuu 2026</span>
@@ -483,14 +389,12 @@ function DecemberIntro({ onStart }: { onStart: () => void }) {
           <span className="dec-intro-balance-amount dec-intro-neg">351,40 €</span>
         </div>
       </div>
-      <button className="month-intro-btn" onClick={onStart}>
-        Aloita joulukuun kirjaukset →
-      </button>
+      <button className="month-intro-btn" onClick={onStart}>Aloita joulukuun kirjaukset →</button>
     </div>
   );
 }
 
-// ─── December summary screen ───────────────────────────────────────────────────
+// ─── December summary ──────────────────────────────────────────────────────────
 
 function DecemberSummary({ onRestart, onNext }: { onRestart: () => void; onNext?: () => void }) {
   return (
@@ -500,49 +404,30 @@ function DecemberSummary({ onRestart, onNext }: { onRestart: () => void; onNext?
         <h2 className="ns-hero-title">Joulukuun kirjaukset valmis!</h2>
         <p className="ns-hero-sub">Kati Mäkisen tmi — marraskuu + joulukuu kirjattu</p>
       </div>
-
       <div className="ns-section">
         <h3 className="ns-section-title">Mitä opit joulukuussa?</h3>
         <div className="ns-compare">
           <div className="ns-compare-card ns-compare-4000">
             <div className="ns-compare-account">4500 Ulkopuoliset palvelut</div>
-            <p className="ns-compare-rule">
-              <strong>Muuttuva kulu</strong> — alihankkijalta ostettu palvelu, joka
-              kuuluu suoraan asiakkaan toimeksiantoon.
-            </p>
-            <p className="ns-compare-example">
-              Esim. Painotalo Vireen tilattu painotyö Katin asiakkaan esitteeseen.
-              Kati laskuttaa sen eteenpäin (edelleenveloitus).
-            </p>
+            <p className="ns-compare-rule"><strong>Muuttuva kulu</strong> — alihankkijalta ostettu palvelu, joka kuuluu suoraan asiakkaan toimeksiantoon.</p>
+            <p className="ns-compare-example">Esim. Painotalo Vireen tilattu painotyö Katin asiakkaan esitteeseen. Kati laskuttaa sen eteenpäin (edelleenveloitus).</p>
           </div>
           <div className="ns-compare-card ns-compare-8400">
             <div className="ns-compare-account">Edelleenveloitus</div>
-            <p className="ns-compare-rule">
-              <strong>3 riviä</strong> — myyntilasku kirjataan palvelumyynnin
-              (3000) ja edelleenveloituksen (3010) tileille erikseen.
-            </p>
-            <p className="ns-compare-example">
-              1700 Myyntisaamiset D / 3000 Myynti K + 3010 Edelleenveloitus K
-            </p>
+            <p className="ns-compare-rule"><strong>3 riviä</strong> — myyntilasku kirjataan palvelumyynnin (3000) ja edelleenveloituksen (3010) tileille erikseen.</p>
+            <p className="ns-compare-example">1700 Myyntisaamiset D / 3000 Myynti K + 3010 Edelleenveloitus K</p>
           </div>
         </div>
       </div>
-
       <div className="ns-actions">
-        <button className="ns-restart-btn" onClick={onRestart}>
-          Aloita joulukuu uudelleen
-        </button>
-        {onNext && (
-          <button className="ns-next-btn" onClick={onNext}>
-            Siirry tammikuuhun (ALV) →
-          </button>
-        )}
+        <button className="ns-restart-btn" onClick={onRestart}>Aloita joulukuu uudelleen</button>
+        {onNext && <button className="ns-next-btn" onClick={onNext}>Siirry tammikuuhun (ALV) →</button>}
       </div>
     </div>
   );
 }
 
-// ─── January intro screen ──────────────────────────────────────────────────────
+// ─── January intro ─────────────────────────────────────────────────────────────
 
 function JanuaryIntro({ onStart }: { onStart: () => void }) {
   return (
@@ -550,21 +435,9 @@ function JanuaryIntro({ onStart }: { onStart: () => void }) {
       <div className="month-intro-icon">🧾</div>
       <h2 className="month-intro-title">Tammikuu 2027 — ALV alkaa</h2>
       <div className="month-intro-story">
-        <p>
-          Katin yritys on kasvanut — marraskuun ja joulukuun yhteisliikevaihto ylitti{' '}
-          <strong>20 000 €:n rajan</strong>. AVL:n (arvonlisäverolain) mukaan Kati rekisteröityy
-          ALV-velvolliseksi tammikuun alusta.
-        </p>
-        <p>
-          Tammikuusta lähtien <strong>kaikki laskut sisältävät ALV:n</strong>. Myyntilaskuihin
-          lisätään 25,5 % ALV, joka tilitetään Verohallinnolle. Ostolaskujen ALV on
-          vähennyskelpoinen — Kati saa vähentää sen myyntiensä ALV:sta.
-        </p>
-        <p>
-          Jokainen ALV:llinen kirjaus tarvitsee <strong>kolme riviä</strong>: myynneissä
-          myyntisaamiset (brutto) + myynti (netto) + suoritettava ALV. Ostoissa kulutili
-          (netto) + vähennettävä ALV + ostovelka tai pankki (brutto).
-        </p>
+        <p>Katin yritys on kasvanut — marraskuun ja joulukuun yhteisliikevaihto ylitti <strong>20 000 €:n rajan</strong>. AVL:n mukaan Kati rekisteröityy ALV-velvolliseksi tammikuun alusta.</p>
+        <p>Tammikuusta lähtien <strong>kaikki laskut sisältävät ALV:n</strong>. Myyntilaskuihin lisätään 25,5 % ALV, joka tilitetään Verohallinnolle. Ostolaskujen ALV on vähennyskelpoinen.</p>
+        <p>Jokainen ALV:llinen kirjaus tarvitsee <strong>kolme riviä</strong>: myynneissä myyntisaamiset (brutto) + myynti (netto) + suoritettava ALV. Ostoissa kulutili (netto) + vähennettävä ALV + pankki tai ostovelka (brutto).</p>
       </div>
       <div className="month-intro-meta">
         <span>📅 Tammikuu 2027</span>
@@ -589,16 +462,14 @@ function JanuaryIntro({ onStart }: { onStart: () => void }) {
           <span className="jan-intro-alv-side jan-alv-k">Tilityksen tulos</span>
         </div>
       </div>
-      <button className="month-intro-btn" onClick={onStart}>
-        Aloita tammikuun kirjaukset →
-      </button>
+      <button className="month-intro-btn" onClick={onStart}>Aloita tammikuun kirjaukset →</button>
     </div>
   );
 }
 
-// ─── January summary screen ────────────────────────────────────────────────────
+// ─── January summary ───────────────────────────────────────────────────────────
 
-function JanuarySummary({ onRestart }: { onRestart: () => void }) {
+function JanuarySummary({ onRestart, onNext }: { onRestart: () => void; onNext?: () => void }) {
   return (
     <div className="ns-root">
       <div className="ns-hero ns-hero-jan">
@@ -606,33 +477,21 @@ function JanuarySummary({ onRestart }: { onRestart: () => void }) {
         <h2 className="ns-hero-title">Tammikuun kirjaukset valmis!</h2>
         <p className="ns-hero-sub">ALV-sykli kk 1: myynti → tilitys → maksu</p>
       </div>
-
       <div className="ns-section">
         <h3 className="ns-section-title">ALV-kirjausten kaavat</h3>
         <div className="ns-compare">
           <div className="ns-compare-card ns-compare-4000">
             <div className="ns-compare-account">Myyntilasku ALV:lla</div>
-            <p className="ns-compare-rule">
-              <strong>3 riviä:</strong> myyntisaamiset koko summa (D) /
-              veroton myynti (K) + suoritettava ALV 2871 (K)
-            </p>
-            <p className="ns-compare-example">
-              1700 D 1 506 / 3000 K 1 200 / 2871 K 306
-            </p>
+            <p className="ns-compare-rule"><strong>3 riviä:</strong> myyntisaamiset koko summa (D) / veroton myynti (K) + suoritettava ALV 2871 (K)</p>
+            <p className="ns-compare-example">1700 D 1 506 / 3000 K 1 200 / 2871 K 306</p>
           </div>
           <div className="ns-compare-card ns-compare-8400">
             <div className="ns-compare-account">Ostolasku / kuitti ALV:lla</div>
-            <p className="ns-compare-rule">
-              <strong>3 riviä:</strong> kulutili veroton (D) + ALV-vähennys 2920 (D) /
-              ostovelka tai pankki koko summa (K)
-            </p>
-            <p className="ns-compare-example">
-              8400 D 40 / 2920 D 10,20 / 1910 K 50,20
-            </p>
+            <p className="ns-compare-rule"><strong>3 riviä:</strong> kulutili veroton (D) + ALV-vähennys 2920 (D) / ostovelka tai pankki koko summa (K)</p>
+            <p className="ns-compare-example">8400 D 40 / 2920 D 10,20 / 1910 K 50,20</p>
           </div>
         </div>
       </div>
-
       <div className="ns-section">
         <h3 className="ns-section-title">ALV-sykli kuukauden lopussa</h3>
         <table className="ns-table">
@@ -654,11 +513,80 @@ function JanuarySummary({ onRestart }: { onRestart: () => void }) {
           </tbody>
         </table>
       </div>
-
       <div className="ns-actions">
-        <button className="ns-restart-btn" onClick={onRestart}>
-          Aloita tammikuu uudelleen
-        </button>
+        <button className="ns-restart-btn" onClick={onRestart}>Aloita tammikuu uudelleen</button>
+        {onNext && (
+          <button className="ns-next-btn" onClick={onNext}>Siirry helmikuuhun (Taso 2) →</button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── February intro ────────────────────────────────────────────────────────────
+
+function FebIntro({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="month-intro">
+      <div className="month-intro-icon">📊</div>
+      <h2 className="month-intro-title">Helmikuu 2027 — Taso 2</h2>
+      <div className="month-intro-story">
+        <p>Helmikuussa opit, että Suomessa on <strong>useita ALV-kantoja</strong>. Yleinen kanta (25,5 %) ei koske kaikkia tuotteita — kirjoilla, elintarvikkeilla ja ravintoloilla on alempi kanta.</p>
+        <p>Lisäksi Kati hankkii uuden kannettavan tietokoneen. Koska sen arvo ylittää 850 € ja käyttöikä on yli 3 vuotta, se ei mene kuluksi heti — se <strong>aktivoidaan taseeseen</strong> ja poistetaan kuukausittain.</p>
+      </div>
+      <div className="month-intro-meta">
+        <span>📅 Helmikuu 2027</span>
+        <span>🏢 Asiakas Tmi — Kati Mäkinen</span>
+        <span>🏦 Nide Bank</span>
+      </div>
+      <div className="feb-intro-alv-rates">
+        <div className="feb-intro-rates-title">ALV-kannat 2027</div>
+        <div className="feb-intro-rate-row">
+          <span className="feb-rate-pct feb-rate-25">25,5 %</span>
+          <span className="feb-rate-desc">Yleinen kanta — palvelut, tavarat</span>
+        </div>
+        <div className="feb-intro-rate-row">
+          <span className="feb-rate-pct feb-rate-13">13,5 %</span>
+          <span className="feb-rate-desc">Kirjat, elintarvikkeet, ravintola</span>
+        </div>
+        <div className="feb-intro-rate-row">
+          <span className="feb-rate-pct feb-rate-10">10,0 %</span>
+          <span className="feb-rate-desc">Sanomalehdet, aikakauslehdet</span>
+        </div>
+      </div>
+      <button className="month-intro-btn" onClick={onStart}>Aloita helmikuun kirjaukset →</button>
+    </div>
+  );
+}
+
+// ─── February summary ──────────────────────────────────────────────────────────
+
+function FebSummary({ onRestart, onNext }: { onRestart: () => void; onNext?: () => void }) {
+  return (
+    <div className="ns-root">
+      <div className="ns-hero ns-hero-feb">
+        <div className="ns-hero-icon">📊</div>
+        <h2 className="ns-hero-title">Helmikuun kirjaukset valmis!</h2>
+        <p className="ns-hero-sub">Taso 2 — useampi ALV-kanta + käyttöomaisuus</p>
+      </div>
+      <div className="ns-section">
+        <h3 className="ns-section-title">Mitä opit helmikuussa?</h3>
+        <div className="ns-compare">
+          <div className="ns-compare-card ns-compare-4000">
+            <div className="ns-compare-account">ALV-kannat</div>
+            <p className="ns-compare-rule">Kirjausrakenne (3 riviä) pysyy samana riippumatta ALV-kannasta. Ainoastaan 2920-rivin summa muuttuu.</p>
+            <p className="ns-compare-example">25,5 % · 13,5 % · 10 % → aina kulutili D / 2920 D / pankki K</p>
+          </div>
+          <div className="ns-compare-card ns-compare-8400">
+            <div className="ns-compare-account">Käyttöomaisuus</div>
+            <p className="ns-compare-rule">Arvo {'>'} 850 € + käyttöikä ≥ 3 v. → aktivoidaan 1200. Poisto: 7680 D / 1200 K joka kuukausi.</p>
+            <p className="ns-compare-example">1 200 € / 60 kk = 20 €/kk × 60 kk</p>
+          </div>
+        </div>
+      </div>
+      <div className="ns-actions">
+        <button className="ns-restart-btn" onClick={onRestart}>Aloita helmikuu uudelleen</button>
+        {onNext && <button className="ns-next-btn" onClick={onNext}>Katso raportit →</button>}
       </div>
     </div>
   );
