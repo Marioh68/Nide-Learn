@@ -81,7 +81,7 @@ export function DocumentCard({ template }: DocumentCardProps) {
               <span className="doc-alv-val">{fmt(netAmount)} €</span>
             </div>
             <div className="doc-alv-row">
-              <span className="doc-alv-label">ALV {vatRate} %</span>
+              <span className="doc-alv-label">ALV {vatRate.toLocaleString('fi-FI')} %</span>
               <span className="doc-alv-val">{fmt(vatAmount)} €</span>
             </div>
             <div className="doc-alv-row doc-alv-total-row">

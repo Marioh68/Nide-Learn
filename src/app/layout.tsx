@@ -3,7 +3,6 @@ import { DM_Sans, Fraunces } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { TeacherProvider } from '@/contexts/TeacherContext';
 import './globals.css';
 
 const fraunces = Fraunces({
@@ -39,9 +38,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider defaultTheme="nide">
-            <TeacherProvider>
-              {children}
-            </TeacherProvider>
+            {children}
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
