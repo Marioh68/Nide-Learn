@@ -68,7 +68,7 @@ export function ReportView() {
 
       {/* ── Pääkirja (trial balance) ────────────────────────────────────────── */}
       <div className="report-section">
-        <h3 className="report-section-title">Pääkirja — koeajo</h3>
+        <h3 className="report-section-title">Pääkirja-koeajo</h3>
         <p className="report-section-desc">
           Kaikki liikutellut tilit debet- ja kredit-summilla. Saldo = debet − kredit.
           Sulkumerkit tarkoittavat negatiivista saldoa (luonnollinen vastattavaa- ja tuottotileillä).
