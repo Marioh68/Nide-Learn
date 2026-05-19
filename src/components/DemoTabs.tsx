@@ -150,48 +150,21 @@ export function DemoTabs() {
 
   return (
     <>
-      {/* Tab bar */}
+      {/* Tab bar — rendered from visibleTabs so teacher can hide tabs */}
       <div className="demo-tabs">
-        <button
-          className={`demo-tab ${tab === 'sanasto' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('sanasto')}
-        >
-          Sanasto
-        </button>
-        <button
-          className={`demo-tab ${tab === 'marraskuu' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('marraskuu')}
-        >
-          Tositekirjaus — Marraskuu
-        </button>
-        <button
-          className={`demo-tab ${tab === 'joulukuu' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('joulukuu')}
-        >
-          Tositekirjaus — Joulukuu
-        </button>
-        <button
-          className={`demo-tab ${tab === 'tammikuu' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('tammikuu')}
-        >
-          Tositekirjaus — Tammikuu (ALV)
-        </button>
-        <button
-          className={`demo-tab ${tab === 'helmikuu' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('helmikuu')}
-        >
-          Tositekirjaus — Helmikuu (Taso 2)
-        </button>
-        <button
-          className={`demo-tab ${tab === 'raportit' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('raportit')}
-        >
-          Raportit
-        </button>
+        {visibleTabs.map((id) => (
+          <button
+            key={id}
+            className={`demo-tab ${effectiveTab === id ? 'demo-tab-active' : ''}`}
+            onClick={() => setTab(id)}
+          >
+            {TAB_LABELS[id]}
+          </button>
+        ))}
       </div>
 
       {/* ── SANASTO ─────────────────────────────────────────────────────────── */}
-      {tab === 'sanasto' && (
+      {effectiveTab === 'sanasto' && (
         <div className="demo-pane">
           <h1 className="demo-h1">Kirjanpidon perussanasto — Taso 1</h1>
           <p className="demo-lead">
@@ -202,14 +175,14 @@ export function DemoTabs() {
       )}
 
       {/* ── MARRASKUU — intro ────────────────────────────────────────────────── */}
-      {tab === 'marraskuu' && !novIntroSeen && (
+      {effectiveTab === 'marraskuu' && !novIntroSeen && (
         <div className="demo-pane">
           <MonthIntro onStart={() => setNovIntroSeen(true)} />
         </div>
       )}
 
       {/* ── MARRASKUU — harjoitukset ─────────────────────────────────────────── */}
-      {tab === 'marraskuu' && novIntroSeen && !novDone && (
+      {effectiveTab === 'marraskuu' && novIntroSeen && !novDone && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
             <ProgressTracker
@@ -231,7 +204,7 @@ export function DemoTabs() {
       )}
 
       {/* ── MARRASKUU — koonti ───────────────────────────────────────────────── */}
-      {tab === 'marraskuu' && novIntroSeen && novDone && (
+      {effectiveTab === 'marraskuu' && novIntroSeen && novDone && (
         <div className="demo-pane">
           <NovemberSummary
             onRestart={() => {
@@ -245,14 +218,14 @@ export function DemoTabs() {
       )}
 
       {/* ── JOULUKUU — intro ────────────────────────────────────────────────── */}
-      {tab === 'joulukuu' && !decIntroSeen && (
+      {effectiveTab === 'joulukuu' && !decIntroSeen && (
         <div className="demo-pane">
           <DecemberIntro onStart={() => setDecIntroSeen(true)} />
         </div>
       )}
 
       {/* ── JOULUKUU — harjoitukset ──────────────────────────────────────────── */}
-      {tab === 'joulukuu' && decIntroSeen && !decDone && (
+      {effectiveTab === 'joulukuu' && decIntroSeen && !decDone && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
             <ProgressTracker
@@ -274,7 +247,7 @@ export function DemoTabs() {
       )}
 
       {/* ── JOULUKUU — koonti ───────────────────────────────────────────────── */}
-      {tab === 'joulukuu' && decIntroSeen && decDone && (
+      {effectiveTab === 'joulukuu' && decIntroSeen && decDone && (
         <div className="demo-pane">
           <DecemberSummary
             onRestart={() => {
@@ -288,14 +261,14 @@ export function DemoTabs() {
       )}
 
       {/* ── TAMMIKUU — intro ─────────────────────────────────────────────────── */}
-      {tab === 'tammikuu' && !janIntroSeen && (
+      {effectiveTab === 'tammikuu' && !janIntroSeen && (
         <div className="demo-pane">
           <JanuaryIntro onStart={() => setJanIntroSeen(true)} />
         </div>
       )}
 
       {/* ── TAMMIKUU — harjoitukset ──────────────────────────────────────────── */}
-      {tab === 'tammikuu' && janIntroSeen && !janDone && (
+      {effectiveTab === 'tammikuu' && janIntroSeen && !janDone && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
             <ProgressTracker
@@ -317,7 +290,7 @@ export function DemoTabs() {
       )}
 
       {/* ── TAMMIKUU — koonti ───────────────────────────────────────────────── */}
-      {tab === 'tammikuu' && janIntroSeen && janDone && (
+      {effectiveTab === 'tammikuu' && janIntroSeen && janDone && (
         <div className="demo-pane">
           <JanuarySummary
             onRestart={() => {
@@ -331,14 +304,14 @@ export function DemoTabs() {
       )}
 
       {/* ── HELMIKUU — intro ─────────────────────────────────────────────────── */}
-      {tab === 'helmikuu' && !febIntroSeen && (
+      {effectiveTab === 'helmikuu' && !febIntroSeen && (
         <div className="demo-pane">
           <FebIntro onStart={() => setFebIntroSeen(true)} />
         </div>
       )}
 
       {/* ── HELMIKUU — harjoitukset ──────────────────────────────────────────── */}
-      {tab === 'helmikuu' && febIntroSeen && !febDone && (
+      {effectiveTab === 'helmikuu' && febIntroSeen && !febDone && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
             <ProgressTracker
@@ -360,7 +333,7 @@ export function DemoTabs() {
       )}
 
       {/* ── HELMIKUU — koonti ───────────────────────────────────────────────── */}
-      {tab === 'helmikuu' && febIntroSeen && febDone && (
+      {effectiveTab === 'helmikuu' && febIntroSeen && febDone && (
         <div className="demo-pane">
           <FebSummary
             onRestart={() => {
@@ -404,7 +377,7 @@ export function DemoTabs() {
       )}
 
       {/* ── RAPORTIT ─────────────────────────────────────────────────────────── */}
-      {tab === 'raportit' && (
+      {effectiveTab === 'raportit' && (
         <div className="demo-pane">
           <ReportView />
         </div>
