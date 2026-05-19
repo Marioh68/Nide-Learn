@@ -4,7 +4,7 @@ import type { KirjanpitoTili } from '@/types/exercises';
 // Tilit käyttöön kuukausioffsetin mukaan: 0 = kk1 (marraskuu)
 export const asiakastmiTilikartta: KirjanpitoTili[] = [
   // ── Vastaavaa ──────────────────────────────────────────────────────────────
-  { numero: '1200', nimi: 'Koneet ja kalusto',          kategoria: 'vastaavaa',  kayttoonotto: 4 },
+  { numero: '1200', nimi: 'Koneet ja kalusto',          kategoria: 'vastaavaa',  kayttoonotto: 3 },
   { numero: '1700', nimi: 'Myyntisaamiset',              kategoria: 'vastaavaa',  kayttoonotto: 0 },
   { numero: '1910', nimi: 'Pankkitili',                  kategoria: 'vastaavaa',  kayttoonotto: 0 },
   { numero: '2920', nimi: 'Vähennettävä ALV ostoista',   kategoria: 'vastaavaa',  kayttoonotto: 2 },
@@ -23,6 +23,7 @@ export const asiakastmiTilikartta: KirjanpitoTili[] = [
   // ── Kulut ──────────────────────────────────────────────────────────────────
   { numero: '4000', nimi: 'Aineet ja tarvikkeet',            kategoria: 'kulut', kayttoonotto: 0 },
   { numero: '4500', nimi: 'Ulkopuoliset palvelut',           kategoria: 'kulut', kayttoonotto: 1 },
+  { numero: '7680', nimi: 'Poistot koneista ja kalustosta', kategoria: 'kulut', kayttoonotto: 3 },
   { numero: '8390', nimi: 'Tietotekniikkakulut',             kategoria: 'kulut', kayttoonotto: 0 },
   { numero: '8400', nimi: 'Liiketoiminnan muut kulut',       kategoria: 'kulut', kayttoonotto: 0 },
 ];
