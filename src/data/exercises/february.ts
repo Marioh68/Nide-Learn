@@ -188,7 +188,7 @@ export const februaryExercises: DocumentExercise[] = [
         'Uusi MacBook Pro työvälineeksi. Veroton 1 200 €, ALV 25,5 % = 306 €. Yhteensä 1 506 €. Käyttöaika 5 vuotta — aktivoidaan käyttöomaisuuteen. Maksuehto 30 pv.',
       amount: 1506,
       vatRate: 25.5,
-      counterparty: 'Verkkokauppa.com Oy',
+      counterparty: 'TechStore Oy',
       invoiceNumber: 'VK-88143',
       dueDay: 28,
       paymentTerm: '30 pv netto',

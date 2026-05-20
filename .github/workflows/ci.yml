@@ -40,3 +40,5 @@ jobs:
 
       - name: E2E tests
         run: pnpm test:e2e
+        env:
+          TEACHER_PASS: e2etest

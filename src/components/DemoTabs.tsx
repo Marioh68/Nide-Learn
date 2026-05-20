@@ -6,22 +6,38 @@ import { ExerciseFlow } from '@/components/ExerciseFlow';
 import { ProgressTracker } from '@/components/ProgressTracker';
 import { MonthIntro } from '@/components/MonthIntro';
 import { ReportView } from '@/components/ReportView';
+import { PaivakirjaView } from '@/components/PaivakirjaView';
 import { level1Vocabulary } from '@/data/vocabulary/level-1';
 import { novemberPhase1Exercises } from '@/data/exercises/november-phase1';
 import { novemberPhase2Exercises } from '@/data/exercises/november-phase2';
 import { decemberExercises } from '@/data/exercises/december';
 import { januaryExercises } from '@/data/exercises/january';
 import { februaryExercises } from '@/data/exercises/february';
+import { marchExercises } from '@/data/exercises/march';
 import { useTheme } from '@/hooks/useTheme';
+import { useTeacher } from '@/contexts/TeacherContext';
+import type { TabId } from '@/contexts/TeacherContext';
 import type { DocumentStatus } from '@/types/exercises';
 
-type Tab = 'sanasto' | 'marraskuu' | 'joulukuu' | 'tammikuu' | 'helmikuu' | 'raportit';
+const TAB_LABELS: Record<TabId, string> = {
+  sanasto:    'Sanasto',
+  marraskuu:  'Tositekirjaus — Marraskuu',
+  joulukuu:   'Tositekirjaus — Joulukuu',
+  tammikuu:   'Tositekirjaus — Tammikuu (ALV)',
+  helmikuu:   'Tositekirjaus — Helmikuu (Taso 2)',
+  maaliskuu:  'Tositekirjaus — Maaliskuu (Taso 3)',
+  paivakirja: 'Päiväkirja',
+  raportit:   'Raportit',
+};
 
 const allNovemberExercises = [...novemberPhase1Exercises, ...novemberPhase2Exercises];
 
 export function DemoTabs() {
-  const [tab, setTab] = useState<Tab>('sanasto');
+  const { visibleTabs } = useTeacher();
+  const [tab, setTab] = useState<TabId>('sanasto');
   const { theme } = useTheme();
+
+  const effectiveTab: TabId = visibleTabs.includes(tab) ? tab : (visibleTabs[0] ?? 'sanasto');
 
   // ── November state ──────────────────────────────────────────────────────────
   const [novIntroSeen, setNovIntroSeen] = useState(false);
@@ -53,6 +69,14 @@ export function DemoTabs() {
   const [febDone, setFebDone] = useState(false);
   const [febStatuses, setFebStatuses] = useState<DocumentStatus[]>(
     februaryExercises.map(() => 'aloittamatta'),
+  );
+
+  // ── March state ─────────────────────────────────────────────────────────────
+  const [marIntroSeen, setMarIntroSeen] = useState(false);
+  const [marIndex, setMarIndex] = useState(0);
+  const [marDone, setMarDone] = useState(false);
+  const [marStatuses, setMarStatuses] = useState<DocumentStatus[]>(
+    marchExercises.map(() => 'aloittamatta'),
   );
 
   // ── November handlers ───────────────────────────────────────────────────────
@@ -111,50 +135,36 @@ export function DemoTabs() {
     }
   }
 
+  // ── March handlers ──────────────────────────────────────────────────────────
+  function handleMarComplete() {
+    const isLast = marIndex === marchExercises.length - 1;
+    setMarStatuses((prev) => { const n = [...prev]; n[marIndex] = 'valmis'; return n; });
+    if (isLast) setMarDone(true);
+    else setMarIndex((i) => i + 1);
+  }
+  function handleMarSelect(index: number) {
+    setMarIndex(index);
+    if (marStatuses[index] === 'aloittamatta')
+      setMarStatuses((prev) => { const n = [...prev]; n[index] = 'kesken'; return n; });
+  }
+
   return (
     <>
-      {/* Tab bar */}
+      {/* Tab bar — rendered from visibleTabs so teacher can hide tabs */}
       <div className="demo-tabs">
-        <button
-          className={`demo-tab ${tab === 'sanasto' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('sanasto')}
-        >
-          Sanasto
-        </button>
-        <button
-          className={`demo-tab ${tab === 'marraskuu' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('marraskuu')}
-        >
-          Tositekirjaus — Marraskuu
-        </button>
-        <button
-          className={`demo-tab ${tab === 'joulukuu' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('joulukuu')}
-        >
-          Tositekirjaus — Joulukuu
-        </button>
-        <button
-          className={`demo-tab ${tab === 'tammikuu' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('tammikuu')}
-        >
-          Tositekirjaus — Tammikuu (ALV)
-        </button>
-        <button
-          className={`demo-tab ${tab === 'helmikuu' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('helmikuu')}
-        >
-          Tositekirjaus — Helmikuu (Taso 2)
-        </button>
-        <button
-          className={`demo-tab ${tab === 'raportit' ? 'demo-tab-active' : ''}`}
-          onClick={() => setTab('raportit')}
-        >
-          Raportit
-        </button>
+        {visibleTabs.map((id) => (
+          <button
+            key={id}
+            className={`demo-tab ${effectiveTab === id ? 'demo-tab-active' : ''}`}
+            onClick={() => setTab(id)}
+          >
+            {TAB_LABELS[id]}
+          </button>
+        ))}
       </div>
 
       {/* ── SANASTO ─────────────────────────────────────────────────────────── */}
-      {tab === 'sanasto' && (
+      {effectiveTab === 'sanasto' && (
         <div className="demo-pane">
           <h1 className="demo-h1">Kirjanpidon perussanasto — Taso 1</h1>
           <p className="demo-lead">
@@ -165,14 +175,14 @@ export function DemoTabs() {
       )}
 
       {/* ── MARRASKUU — intro ────────────────────────────────────────────────── */}
-      {tab === 'marraskuu' && !novIntroSeen && (
+      {effectiveTab === 'marraskuu' && !novIntroSeen && (
         <div className="demo-pane">
           <MonthIntro onStart={() => setNovIntroSeen(true)} />
         </div>
       )}
 
       {/* ── MARRASKUU — harjoitukset ─────────────────────────────────────────── */}
-      {tab === 'marraskuu' && novIntroSeen && !novDone && (
+      {effectiveTab === 'marraskuu' && novIntroSeen && !novDone && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
             <ProgressTracker
@@ -194,7 +204,7 @@ export function DemoTabs() {
       )}
 
       {/* ── MARRASKUU — koonti ───────────────────────────────────────────────── */}
-      {tab === 'marraskuu' && novIntroSeen && novDone && (
+      {effectiveTab === 'marraskuu' && novIntroSeen && novDone && (
         <div className="demo-pane">
           <NovemberSummary
             onRestart={() => {
@@ -208,14 +218,14 @@ export function DemoTabs() {
       )}
 
       {/* ── JOULUKUU — intro ────────────────────────────────────────────────── */}
-      {tab === 'joulukuu' && !decIntroSeen && (
+      {effectiveTab === 'joulukuu' && !decIntroSeen && (
         <div className="demo-pane">
           <DecemberIntro onStart={() => setDecIntroSeen(true)} />
         </div>
       )}
 
       {/* ── JOULUKUU — harjoitukset ──────────────────────────────────────────── */}
-      {tab === 'joulukuu' && decIntroSeen && !decDone && (
+      {effectiveTab === 'joulukuu' && decIntroSeen && !decDone && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
             <ProgressTracker
@@ -237,7 +247,7 @@ export function DemoTabs() {
       )}
 
       {/* ── JOULUKUU — koonti ───────────────────────────────────────────────── */}
-      {tab === 'joulukuu' && decIntroSeen && decDone && (
+      {effectiveTab === 'joulukuu' && decIntroSeen && decDone && (
         <div className="demo-pane">
           <DecemberSummary
             onRestart={() => {
@@ -251,14 +261,14 @@ export function DemoTabs() {
       )}
 
       {/* ── TAMMIKUU — intro ─────────────────────────────────────────────────── */}
-      {tab === 'tammikuu' && !janIntroSeen && (
+      {effectiveTab === 'tammikuu' && !janIntroSeen && (
         <div className="demo-pane">
           <JanuaryIntro onStart={() => setJanIntroSeen(true)} />
         </div>
       )}
 
       {/* ── TAMMIKUU — harjoitukset ──────────────────────────────────────────── */}
-      {tab === 'tammikuu' && janIntroSeen && !janDone && (
+      {effectiveTab === 'tammikuu' && janIntroSeen && !janDone && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
             <ProgressTracker
@@ -280,7 +290,7 @@ export function DemoTabs() {
       )}
 
       {/* ── TAMMIKUU — koonti ───────────────────────────────────────────────── */}
-      {tab === 'tammikuu' && janIntroSeen && janDone && (
+      {effectiveTab === 'tammikuu' && janIntroSeen && janDone && (
         <div className="demo-pane">
           <JanuarySummary
             onRestart={() => {
@@ -294,14 +304,14 @@ export function DemoTabs() {
       )}
 
       {/* ── HELMIKUU — intro ─────────────────────────────────────────────────── */}
-      {tab === 'helmikuu' && !febIntroSeen && (
+      {effectiveTab === 'helmikuu' && !febIntroSeen && (
         <div className="demo-pane">
           <FebIntro onStart={() => setFebIntroSeen(true)} />
         </div>
       )}
 
       {/* ── HELMIKUU — harjoitukset ──────────────────────────────────────────── */}
-      {tab === 'helmikuu' && febIntroSeen && !febDone && (
+      {effectiveTab === 'helmikuu' && febIntroSeen && !febDone && (
         <div className="demo-pane demo-pane-split">
           <aside className="demo-sidebar">
             <ProgressTracker
@@ -323,7 +333,7 @@ export function DemoTabs() {
       )}
 
       {/* ── HELMIKUU — koonti ───────────────────────────────────────────────── */}
-      {tab === 'helmikuu' && febIntroSeen && febDone && (
+      {effectiveTab === 'helmikuu' && febIntroSeen && febDone && (
         <div className="demo-pane">
           <FebSummary
             onRestart={() => {
@@ -336,8 +346,38 @@ export function DemoTabs() {
         </div>
       )}
 
+      {/* ── MAALISKUU ────────────────────────────────────────────────────────── */}
+      {effectiveTab === 'maaliskuu' && !marIntroSeen && (
+        <div className="demo-pane"><MarIntro onStart={() => setMarIntroSeen(true)} /></div>
+      )}
+      {effectiveTab === 'maaliskuu' && marIntroSeen && !marDone && (
+        <div className="demo-pane demo-pane-split">
+          <aside className="demo-sidebar">
+            <ProgressTracker exercises={marchExercises} statuses={marStatuses} currentIndex={marIndex} onSelect={handleMarSelect} />
+          </aside>
+          <div className="demo-exercise-area">
+            <ExerciseFlow key={marIndex} exercise={marchExercises[marIndex]} theme={theme} onComplete={handleMarComplete} />
+          </div>
+        </div>
+      )}
+      {effectiveTab === 'maaliskuu' && marIntroSeen && marDone && (
+        <div className="demo-pane">
+          <MarSummary
+            onRestart={() => { setMarDone(false); setMarIndex(0); setMarStatuses(marchExercises.map(() => 'aloittamatta')); }}
+            onNext={() => setTab('paivakirja')}
+          />
+        </div>
+      )}
+
+      {/* ── PÄIVÄKIRJA ───────────────────────────────────────────────────────── */}
+      {effectiveTab === 'paivakirja' && (
+        <div className="demo-pane">
+          <PaivakirjaView />
+        </div>
+      )}
+
       {/* ── RAPORTIT ─────────────────────────────────────────────────────────── */}
-      {tab === 'raportit' && (
+      {effectiveTab === 'raportit' && (
         <div className="demo-pane">
           <ReportView />
         </div>
@@ -814,14 +854,87 @@ function FebSummary({ onRestart, onNext }: { onRestart: () => void; onNext?: () 
       </div>
 
       <div className="ns-actions">
-        <button className="ns-restart-btn" onClick={onRestart}>
-          Aloita helmikuu uudelleen
-        </button>
-        {onNext && (
-          <button className="ns-next-btn" onClick={onNext}>
-            Katso raportit →
-          </button>
-        )}
+        <button className="ns-restart-btn" onClick={onRestart}>Aloita helmikuu uudelleen</button>
+        {onNext && <button className="ns-next-btn" onClick={onNext}>Siirry maaliskuuhun (Taso 3) →</button>}
+      </div>
+    </div>
+  );
+}
+
+// ─── March intro ───────────────────────────────────────────────────────────────
+
+function MarIntro({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="month-intro">
+      <div className="month-intro-icon">💼</div>
+      <h2 className="month-intro-title">Maaliskuu 2027 — Taso 3</h2>
+      <div className="month-intro-story">
+        <p>Katin yritys kasvaa — hän palkkaa osa-aikaisen avustajan maaliskuuksi. Tämä tuo mukaan uuden kirjauskokonaisuuden: <strong>palkanlaskenta</strong>.</p>
+        <p>Kun palkka maksetaan, koko bruttopalkka kirjataan kuluksi. Verovirasto ei saa rahaa heti — ennakonpidätys jää velaksi (2960) kunnes se tilitetään. Nettopalkan maksat suoraan pankkitililtä palkkavelkatilin (2910) kautta.</p>
+        <p>Lisäksi työnantaja maksaa <strong>sosiaaliturvamaksun</strong> (sotu) omana kulunaan — se ei tule palkansaajan palkasta.</p>
+      </div>
+      <div className="month-intro-meta">
+        <span>📅 Maaliskuu 2027</span>
+        <span>🏢 Asiakas Tmi — Kati Mäkinen</span>
+        <span>🏦 Nide Bank</span>
+      </div>
+      <div className="mar-intro-palkka-box">
+        <div className="mar-intro-palkka-title">Palkkakirjauksen rakenne</div>
+        <div className="mar-intro-palkka-row">
+          <span className="mar-palkka-tili">5000 Palkat</span>
+          <span className="mar-palkka-side mar-palkka-d">D bruttopalkka</span>
+        </div>
+        <div className="mar-intro-palkka-row">
+          <span className="mar-palkka-tili">2960 Ennakonpidätysvelka</span>
+          <span className="mar-palkka-side mar-palkka-k">K pidätys</span>
+        </div>
+        <div className="mar-intro-palkka-row">
+          <span className="mar-palkka-tili">2910 Palkkavelka</span>
+          <span className="mar-palkka-side mar-palkka-k">K nettopalkat</span>
+        </div>
+        <div className="mar-intro-palkka-divider" />
+        <div className="mar-intro-palkka-row">
+          <span className="mar-palkka-tili">5300 Työnantajan sotumaksut</span>
+          <span className="mar-palkka-side mar-palkka-d">D sotu-kulu</span>
+        </div>
+        <div className="mar-intro-palkka-row">
+          <span className="mar-palkka-tili">2970 Sotumaksuvelka</span>
+          <span className="mar-palkka-side mar-palkka-k">K velka Verohallinnolle</span>
+        </div>
+      </div>
+      <button className="month-intro-btn" onClick={onStart}>Aloita maaliskuun kirjaukset →</button>
+    </div>
+  );
+}
+
+// ─── March summary ─────────────────────────────────────────────────────────────
+
+function MarSummary({ onRestart, onNext }: { onRestart: () => void; onNext?: () => void }) {
+  return (
+    <div className="ns-root">
+      <div className="ns-hero ns-hero-mar">
+        <div className="ns-hero-icon">💼</div>
+        <h2 className="ns-hero-title">Maaliskuun kirjaukset valmis!</h2>
+        <p className="ns-hero-sub">Taso 3 — palkat ja sotumaksut</p>
+      </div>
+      <div className="ns-section">
+        <h3 className="ns-section-title">Mitä opit maaliskuussa?</h3>
+        <div className="ns-compare">
+          <div className="ns-compare-card ns-compare-4000">
+            <div className="ns-compare-account">Palkkakirjauksen sykli</div>
+            <p className="ns-compare-rule"><strong>4 vaihetta:</strong> palkkakirjaus → sotumaksu → palkanmaksu → tilitys.</p>
+            <p className="ns-compare-example">5000 D brutto / 2960 K pidätys / 2910 K netto → 2910 D / 1910 K → 2960 D / 2970 D / 1910 K</p>
+          </div>
+          <div className="ns-compare-card ns-compare-8400">
+            <div className="ns-compare-account">Työnantajan sotumaksu</div>
+            <p className="ns-compare-rule">Erillinen kulu — ei tule palkansaajalta. 5300 D / 2970 K. Maksetaan yhdessä ennakonpidätyksen kanssa.</p>
+            <p className="ns-compare-example">Sotu-% × bruttopalkka = kulu. Suomi 2027: n. 2 %.</p>
+          </div>
+        </div>
+      </div>
+      <div className="ns-actions">
+        <button className="ns-restart-btn" onClick={onRestart}>Aloita maaliskuu uudelleen</button>
+        {onNext && <button className="ns-next-btn" onClick={onNext}>Siirry päiväkirjaan →</button>}
       </div>
     </div>
   );
