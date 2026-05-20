@@ -12,7 +12,7 @@ test.describe('Raportit-välilehti', () => {
     await expect(page.getByRole('heading', { name: 'Raportit' })).toBeVisible();
     await expect(page.getByText('Pääkirja-koeajo')).toBeVisible();
     await expect(page.getByText('Tuloslaskelma')).toBeVisible();
-    await expect(page.getByText('Tase')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Tase' })).toBeVisible();
   });
 
   test('tase on tasapainossa oletusvalinnalla (helmikuu)', async ({ page }) => {
